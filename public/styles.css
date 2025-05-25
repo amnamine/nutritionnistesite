@@ -2154,4 +2154,71 @@ header {
 
 .step-actions button {
     flex: 1;
+}
+
+/* Liste verticale des patients pour diététicien */
+.patient-list-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.patient-list-vertical .patient-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(44,62,80,0.10);
+    padding: 18px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: box-shadow 0.2s, transform 0.2s;
+    border-left: 5px solid #4f8cff;
+    position: relative;
+}
+
+.patient-list-vertical .patient-card:hover {
+    box-shadow: 0 6px 24px rgba(44,62,80,0.16);
+    transform: translateY(-2px) scale(1.02);
+    border-left: 5px solid #50C878;
+}
+
+.patient-list-vertical .patient-card h3 {
+    margin: 0 0 4px 0;
+    font-size: 1.15rem;
+    color: #357ABD;
+    font-weight: 600;
+}
+
+.patient-list-vertical .patient-card p {
+    margin: 0;
+    color: #444;
+    font-size: 0.98rem;
+}
+
+.patient-list-vertical .action-buttons {
+    margin-top: 8px;
+    display: flex;
+    gap: 10px;
+}
+
+.patient-list-vertical .edit-btn, .patient-list-vertical .archive-btn {
+    background: #f5f7fa;
+    color: #4f8cff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 0.97rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.patient-list-vertical .edit-btn:hover {
+    background: #4f8cff;
+    color: #fff;
+}
+
+.patient-list-vertical .archive-btn:hover {
+    background: #ff4b5c;
+    color: #fff;
 } 

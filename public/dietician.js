@@ -98,6 +98,11 @@ async function searchPatient() {
 
 function displayPatients(patients) {
     const resultsDiv = document.getElementById('search-results');
+    resultsDiv.classList.add('patient-list-vertical');
+    if (!patients || patients.length === 0) {
+        resultsDiv.innerHTML = '<div style="text-align:center;color:#888;font-size:1.1rem;padding:20px;">Aucun patient trouvé.</div>';
+        return;
+    }
     resultsDiv.innerHTML = patients.map(patient => `
         <div class="patient-card">
             <h3>${patient.first_name} ${patient.last_name}</h3>
