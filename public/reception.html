@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espace Réceptionniste</title>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <!-- FullCalendar CSS -->
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/locale/fr.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/fr.js'></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Espace Réceptionniste</h1>
+            <div class="user-info">
+                <span id="user-role"></span>
+                <button id="logout-btn" class="btn btn-danger">
+                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                </button>
+            </div>
+        </header>
+
+        <main>
+            <!-- Section Gestion Patients -->
+            <section id="patient-management" class="section">
+                <h2>Gestion des Patients</h2>
+                
+                <!-- Recherche de patient -->
+                <div class="search-box">
+                    <input type="text" id="patient-search" placeholder="Rechercher un patient...">
+                    <button onclick="searchPatient()" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Rechercher
+                    </button>
+                </div>
+                
+                <!-- Résultats de recherche -->
+                <div id="search-results" class="results-container"></div>
+                
+                <!-- Formulaire d'ajout de patient -->
+                <div class="form-container">
+                    <button id="show-add-patient" class="btn btn-success">
+                        <i class="fas fa-user-plus"></i> Ajouter un nouveau patient
+                    </button>
+                    
+                    <form id="patient-form" style="display: none;">
+                        <h3>Nouveau Patient</h3>
+                        <div class="form-group">
+                            <label for="first-name">Prénom</label>
+                            <input type="text" id="first-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="last-name">Nom</label>
+                            <input type="text" id="last-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Téléphone</label>
+                            <input type="tel" id="phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Adresse</label>
+                            <textarea id="address"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Section de prise de rendez-vous -->
+            <div class="section">
+                <h2><i class="fas fa-calendar-plus"></i> Prise de rendez-vous</h2>
+                
+                <div class="booking-container">
+                    <!-- Progress Bar -->
+                    <div class="booking-progress">
+                        <div class="progress-step active" id="progress-step1">
+                            <div class="step-icon"><i class="fas fa-calendar"></i></div>
+                            <span class="step-label">Date</span>
+                        </div>
+                        <div class="progress-line"></div>
+                        <div class="progress-step" id="progress-step2">
+                            <div class="step-icon"><i class="fas fa-clock"></i></div>
+                            <span class="step-label">Horaire</span>
+                        </div>
+                        <div class="progress-line"></div>
+                        <div class="progress-step" id="progress-step3">
+                            <div class="step-icon"><i class="fas fa-user"></i></div>
+                            <span class="step-label">Patient</span>
+                        </div>
+                        <div class="progress-line"></div>
+                        <div class="progress-step" id="progress-step4">
+                            <div class="step-icon"><i class="fas fa-check-circle"></i></div>
+                            <span class="step-label">Validation</span>
+                        </div>
+                    </div>
+
+                    <!-- Étape 1: Sélection de la date -->
+                    <div id="step1" class="booking-step active">
+                        <div class="step-content">
+                            <h3>Choisissez une date</h3>
+                            <p class="step-description">Sélectionnez la date souhaitée pour votre rendez-vous.</p>
+                            
+                            <div class="calendar-container">
+                                <div class="calendar-header">
+                                    <div class="selected-date">
+                                        <i class="fas fa-calendar-check"></i>
+                                        <span id="display-selected-date">Aucune date sélectionnée</span>
+                                    </div>
+                                </div>
+                                <div id="calendar"></div>
+                                <div class="calendar-footer">
+                                    <div class="date-info">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>Cliquez sur une date pour la sélectionner</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="step-actions">
+                                <button onclick="selectDate()" class="btn-next" id="continue-date-btn" disabled>
+                                    <i class="fas fa-arrow-right"></i> Continuer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Étape 2: Sélection de l'horaire -->
+                    <div id="step2" class="booking-step">
+                        <div class="step-content">
+                            <h3>Choisissez un horaire</h3>
+                            <p class="step-description">Sélectionnez un horaire disponible pour votre rendez-vous.</p>
+                            
+                            <div class="time-slots-container">
+                                <div class="time-slots-list">
+                                    <button class="time-slot" data-time="08:00">8h00</button>
+                                    <button class="time-slot" data-time="09:00">9h00</button>
+                                    <button class="time-slot" data-time="10:00">10h00</button>
+                                    <button class="time-slot" data-time="11:00">11h00</button>
+                                    <button class="time-slot" data-time="12:00">12h00</button>
+                                    <button class="time-slot" data-time="13:00">13h00</button>
+                                    <button class="time-slot" data-time="14:00">14h00</button>
+                                    <button class="time-slot" data-time="15:00">15h00</button>
+                                    <button class="time-slot" data-time="16:00">16h00</button>
+                                    <button class="time-slot" data-time="17:00">17h00</button>
+                                </div>
+                            </div>
+
+                            <div class="step-actions">
+                                <button onclick="previousStep(2)" class="btn-back">
+                                    <i class="fas fa-arrow-left"></i> Retour
+                                </button>
+                                <button onclick="selectTime()" class="btn-next" id="continue-time-btn" disabled>
+                                    <i class="fas fa-arrow-right"></i> Continuer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Étape 3: Informations patient -->
+                    <div id="step3" class="booking-step">
+                        <div class="step-content">
+                            <h3>Informations du patient</h3>
+                            <p class="step-description">Veuillez entrer les informations du patient.</p>
+                            <div class="form-group">
+                                <label for="patient-name">Nom du patient</label>
+                                <input type="text" id="patient-name" class="form-control" placeholder="Entrez le nom du patient">
+                            </div>
+                            <div class="form-group">
+                                <label for="patient-firstname">Prénom du patient</label>
+                                <input type="text" id="patient-firstname" class="form-control" placeholder="Entrez le prénom du patient">
+                            </div>
+                            <div class="step-actions">
+                                <button onclick="previousStep(3)" class="btn-back">
+                                    <i class="fas fa-arrow-left"></i> Retour
+                                </button>
+                                <button onclick="validatePatientInfo()" class="btn-next">
+                                    <i class="fas fa-arrow-right"></i> Continuer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Étape 4: Confirmation -->
+                    <div id="step4" class="booking-step">
+                        <div class="step-content">
+                            <h3>Confirmez le rendez-vous</h3>
+                            <p class="step-description">Veuillez vérifier les détails de votre rendez-vous.</p>
+                            <div class="appointment-summary">
+                                <div class="summary-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span id="summary-date"></span>
+                                </div>
+                                <div class="summary-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span id="summary-time"></span>
+                                </div>
+                                <div class="summary-item">
+                                    <i class="fas fa-user"></i>
+                                    <span id="summary-patient"></span>
+                                </div>
+                            </div>
+                            <div class="step-actions">
+                                <button onclick="previousStep(4)" class="btn-back">
+                                    <i class="fas fa-arrow-left"></i> Retour
+                                </button>
+                                <button onclick="confirmAppointment()" class="btn-validate">
+                                    <i class="fas fa-check"></i> Confirmer le rendez-vous
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Liste des Rendez-vous -->
+            <section id="appointment-list" class="section">
+                <h2>Liste des Rendez-vous</h2>
+                
+                <!-- Recherche de rendez-vous -->
+                <div class="search-box">
+                    <input type="date" id="appointment-date">
+                    <button onclick="searchAppointments()" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Rechercher les rendez-vous
+                    </button>
+                </div>
+                
+                <!-- Liste des rendez-vous -->
+                <div id="appointment-list-results" class="results-container"></div>
+
+                <!-- Rendez-vous du jour -->
+                <div class="today-appointments">
+                    <h3><i class="fas fa-calendar-day"></i> Rendez-vous du jour</h3>
+                    <button onclick="loadTodayAppointments()" class="btn btn-info">
+                         Afficher les rendez-vous d'aujourd'hui
+                    </button>
+                    <div id="today-list" class="today-appointments-list"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal pour modifier un patient -->
+    <div id="patient-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form id="edit-patient-form">
+                <input type="hidden" id="edit-patient-id">
+                <div class="form-group">
+                    <label for="edit-first-name">Prénom</label>
+                    <input type="text" id="edit-first-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-last-name">Nom</label>
+                    <input type="text" id="edit-last-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-phone">Téléphone</label>
+                    <input type="tel" id="edit-phone">
+                </div>
+                <div class="form-group">
+                    <label for="edit-email">Email</label>
+                    <input type="email" id="edit-email">
+                </div>
+                <div class="form-group">
+                    <label for="edit-address">Adresse</label>
+                    <textarea id="edit-address"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Modifier</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="reception.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize FullCalendar
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'fr',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: ''
+            },
+            selectable: true,
+            selectMirror: true,
+            dayMaxEvents: true,
+            select: function(info) {
+                // Update selected date display
+                var selectedDate = info.startStr;
+                document.getElementById('display-selected-date').textContent = 
+                    new Date(selectedDate).toLocaleDateString('fr-FR', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                
+                // Enable continue button
+                document.getElementById('continue-date-btn').disabled = false;
+                
+                // Store selected date
+                window.selectedAppointmentDate = selectedDate;
+            },
+            // Disable past dates
+            validRange: {
+                start: new Date()
+            },
+            // Customize date cell rendering
+            dayCellDidMount: function(info) {
+                // Add custom class for styling
+                info.el.classList.add('fc-day-custom');
+            }
+        });
+        
+        calendar.render();
+    });
+
+    // Function to handle date selection and move to next step
+    function selectDate() {
+        if (window.selectedAppointmentDate) {
+            // Hide current step
+            document.getElementById('step1').classList.remove('active');
+            // Show next step
+            document.getElementById('step2').classList.add('active');
+            // Update progress bar
+            document.getElementById('progress-step1').classList.add('completed');
+            document.getElementById('progress-step2').classList.add('active');
+        }
+    }
+
+    // Time slot selection
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add click event to time slots
+        const timeSlots = document.querySelectorAll('.time-slot');
+        timeSlots.forEach(slot => {
+            slot.addEventListener('click', function() {
+                // Remove selected class from all slots
+                timeSlots.forEach(s => s.classList.remove('selected'));
+                // Add selected class to clicked slot
+                this.classList.add('selected');
+                // Enable continue button
+                document.getElementById('continue-time-btn').disabled = false;
+                // Store selected time
+                window.selectedAppointmentTime = this.dataset.time;
+            });
+        });
+    });
+
+    function selectTime() {
+        if (window.selectedAppointmentTime) {
+            // Hide current step
+            document.getElementById('step2').classList.remove('active');
+            // Show next step
+            document.getElementById('step3').classList.add('active');
+            // Update progress bar
+            document.getElementById('progress-step2').classList.add('completed');
+            document.getElementById('progress-step3').classList.add('active');
+        }
+    }
+    </script>
+</body>
+</html> 

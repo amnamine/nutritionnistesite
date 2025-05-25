@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cabinet de Diététique</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body.landing {
+            min-height: 100vh;
+            background: linear-gradient(120deg, #4A90E2 0%, #50C878 100%);
+            display: flex;
+            flex-direction: column;
+        }
+        .landing-hero {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #fff;
+            padding: 4rem 1rem 2rem 1rem;
+        }
+        .landing-hero h1 {
+            font-size: 3.2rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            letter-spacing: 1px;
+            text-shadow: 0 4px 24px rgba(0,0,0,0.12);
+        }
+        .landing-hero p {
+            font-size: 1.3rem;
+            font-weight: 400;
+            margin-bottom: 2.5rem;
+            color: #e3f2fd;
+        }
+        .landing-cta-btn {
+            background: #fff;
+            color: #4A90E2;
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 30px;
+            box-shadow: 0 4px 24px rgba(80,200,120,0.10);
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, transform 0.2s;
+            margin-bottom: 2.5rem;
+        }
+        .landing-cta-btn:hover {
+            background: #50C878;
+            color: #fff;
+            transform: translateY(-2px) scale(1.04);
+        }
+        .landing-features {
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+        .feature-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 18px;
+            box-shadow: 0 2px 16px rgba(44,62,80,0.08);
+            padding: 2rem 1.5rem;
+            min-width: 260px;
+            max-width: 320px;
+            margin: 0.5rem 0;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .feature-card:hover {
+            transform: translateY(-6px) scale(1.03);
+            box-shadow: 0 8px 32px rgba(44,62,80,0.13);
+        }
+        .feature-card i {
+            font-size: 2.5rem;
+            color: #50C878;
+            margin-bottom: 1rem;
+        }
+        .feature-card h3 {
+            color: #357ABD;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .feature-card p {
+            color: #6C757D;
+            font-size: 1rem;
+        }
+        .landing-footer {
+            background: rgba(255,255,255,0.95);
+            color: #357ABD;
+            text-align: center;
+            padding: 1.2rem 0 0.7rem 0;
+            font-size: 1rem;
+            border-top-left-radius: 18px;
+            border-top-right-radius: 18px;
+            box-shadow: 0 -2px 12px rgba(44,62,80,0.06);
+        }
+        .landing-nav {
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 2.5rem 0 2.5rem;
+        }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 2px 12px rgba(44,62,80,0.13);
+        }
+        .nav-brand i {
+            color: #FF6B6B;
+        }
+        .landing-login-btn {
+            background: #fff;
+            color: #4A90E2;
+            border: none;
+            border-radius: 30px;
+            padding: 0.7rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 12px rgba(44,62,80,0.10);
+            transition: background 0.2s, color 0.2s, transform 0.2s;
+        }
+        .landing-login-btn:hover {
+            background: #50C878;
+            color: #fff;
+            transform: translateY(-2px) scale(1.04);
+        }
+        @media (max-width: 900px) {
+            .landing-features { flex-direction: column; gap: 1.5rem; }
+            .landing-nav { flex-direction: column; gap: 1.5rem; }
+        }
+        @media (max-width: 600px) {
+            .landing-hero h1 { font-size: 2.1rem; }
+            .landing-hero p { font-size: 1rem; }
+            .feature-card { min-width: 90vw; }
+            .landing-nav { padding: 1.2rem 1rem 0 1rem; }
+        }
+    </style>
+</head>
+<body class="landing">
+    <nav class="landing-nav">
+        <div class="nav-brand">
+            <i class="fas fa-heartbeat"></i>
+            <span>Cabinet de Diététique</span>
+        </div>
+        <button class="landing-login-btn" onclick="showLoginPage()">
+            <i class="fas fa-sign-in-alt"></i>
+            Connexion
+        </button>
+    </nav>
+    <div class="landing-hero">
+        <h1>Bienvenue dans votre Cabinet de Diététique</h1>
+        <p>Gérez vos patients, rendez-vous et consultations en toute simplicité, avec une expérience moderne et intuitive.</p>
+        <button class="landing-cta-btn" onclick="showLoginPage()">
+            <i class="fas fa-sign-in-alt"></i>
+            Se connecter
+        </button>
+        <div class="landing-features">
+            <div class="feature-card">
+                <i class="fas fa-users"></i>
+                <h3>Gestion des Patients</h3>
+                <p>Suivi complet, historique, archivage et gestion centralisée des dossiers patients.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-calendar-alt"></i>
+                <h3>Rendez-vous</h3>
+                <p>Planification intelligente, disponibilité en temps réel et validation rapide.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-chart-line"></i>
+                <h3>Suivi Nutritionnel</h3>
+                <p>Analyse des progrès, IMC, consultations et catalogue alimentaire interactif.</p>
+            </div>
+        </div>
+    </div>
+    <footer class="landing-footer">
+        <p>&copy; 2024 Cabinet de Diététique. Tous droits réservés.</p>
+    </footer>
+    <script>
+        function showLoginPage() {
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html> 
