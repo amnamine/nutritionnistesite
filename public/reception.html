@@ -7,10 +7,330 @@
     
     <!-- Styles -->
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- FullCalendar CSS -->
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    
+    <style>
+        /* Reception-specific styles */
+        .reception-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: var(--spacing-xl);
+            border-radius: var(--border-radius-lg);
+            margin-bottom: var(--spacing-xl);
+            box-shadow: var(--shadow-lg);
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .reception-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: var(--spacing-sm);
+            font-weight: 600;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+
+        .booking-container {
+            background: var(--surface);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: var(--spacing-xl);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .booking-progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xl);
+            padding: 0 var(--spacing-lg);
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--surface-light);
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--spacing-sm);
+            transition: var(--transition);
+        }
+
+        .progress-step.active .step-icon {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .progress-step.completed .step-icon {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .step-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .progress-line {
+            flex: 1;
+            height: 2px;
+            background: var(--surface-light);
+            margin: 0 var(--spacing-md);
+            position: relative;
+            top: -25px;
+        }
+
+        .progress-line.active {
+            background: var(--primary);
+        }
+
+        .booking-step {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .booking-step.active {
+            display: block;
+        }
+
+        .step-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .step-content h3 {
+            color: var(--primary-dark);
+            font-size: 1.5rem;
+            margin-bottom: var(--spacing-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .step-description {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .calendar-container {
+            background: var(--surface);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 2px solid var(--surface-light);
+        }
+
+        .selected-date {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--primary-light);
+            border-radius: var(--border-radius-sm);
+            color: var(--primary-dark);
+            font-weight: 500;
+        }
+
+        .time-slots-container {
+            background: var(--surface);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin: var(--spacing-lg) 0;
+        }
+
+        .time-slots-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+
+        .time-slot {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-sm);
+            text-align: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .time-slot:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .time-slot.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .time-slot:disabled {
+            background: var(--surface-light);
+            color: var(--text-light);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .appointment-summary {
+            background: var(--primary-light);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius);
+            margin: var(--spacing-lg) 0;
+            border-left: 6px solid var(--primary);
+        }
+
+        .summary-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-item i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .step-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: var(--spacing-xl);
+            gap: var(--spacing-md);
+        }
+
+        .btn-next, .btn-back, .btn-validate {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            transition: var(--transition);
+        }
+
+        .btn-next {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-back {
+            background: var(--surface-light);
+            color: var(--text-primary);
+        }
+
+        .btn-validate {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-next:hover, .btn-validate:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-back:hover {
+            background: var(--text-light);
+            color: white;
+        }
+
+        .today-appointments {
+            background: var(--surface);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-top: var(--spacing-xl);
+        }
+
+        .today-appointments h3 {
+            color: var(--primary-dark);
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .today-appointments-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+        }
+
+        .appointment-item {
+            background: var(--surface-light);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+            border-left: 4px solid var(--primary);
+        }
+
+        .appointment-item:hover {
+            transform: translateX(5px);
+            box-shadow: var(--shadow);
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
     
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -21,11 +341,11 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Espace Réceptionniste</h1>
+        <header class="reception-header">
+            <h1><i class="fas fa-hospital-user"></i> Espace Réceptionniste</h1>
             <div class="user-info">
                 <span id="user-role"></span>
-                <button id="logout-btn" class="btn btn-danger">
+                <button id="logout-btn" class="logout-btn">
                     <i class="fas fa-sign-out-alt"></i> Déconnexion
                 </button>
             </div>
@@ -34,54 +354,61 @@
         <main>
             <!-- Section Gestion Patients -->
             <section id="patient-management" class="section">
-                <h2>Gestion des Patients</h2>
+                <h2><i class="fas fa-users"></i> Gestion des Patients</h2>
                 
                 <!-- Recherche de patient -->
-                <div class="search-box">
-                    <input type="text" id="patient-search" placeholder="Rechercher un patient...">
-                    <button onclick="searchPatient()" class="btn btn-primary">
+                <div class="search-section">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="patient-search" placeholder="Rechercher un patient...">
+                    </div>
+                    <button onclick="searchPatient()" class="search-btn">
                         <i class="fas fa-search"></i> Rechercher
                     </button>
                 </div>
                 
                 <!-- Résultats de recherche -->
-                <div id="search-results" class="results-container"></div>
+                <div id="search-results" class="results-section patient-list-vertical"></div>
                 
                 <!-- Formulaire d'ajout de patient -->
-                <div class="form-container">
-                    <button id="show-add-patient" class="btn btn-success">
+                <div class="form-section">
+                    <button id="show-add-patient" class="submit-btn">
                         <i class="fas fa-user-plus"></i> Ajouter un nouveau patient
                     </button>
                     
                     <form id="patient-form" style="display: none;">
-                        <h3>Nouveau Patient</h3>
-                        <div class="form-group">
-                            <label for="first-name">Prénom</label>
-                            <input type="text" id="first-name" required>
+                        <h3><i class="fas fa-user-plus"></i> Nouveau Patient</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="first-name">Prénom</label>
+                                <input type="text" id="first-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="last-name">Nom</label>
+                                <input type="text" id="last-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Téléphone</label>
+                                <input type="tel" id="phone">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email">
+                            </div>
+                            <div class="form-group">
+                                <label for="address">Adresse</label>
+                                <textarea id="address"></textarea>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="last-name">Nom</label>
-                            <input type="text" id="last-name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="phone">Téléphone</label>
-                            <input type="tel" id="phone">
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email">
-                        </div>
-                        <div class="form-group">
-                            <label for="address">Adresse</label>
-                            <textarea id="address"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
                     </form>
                 </div>
             </section>
 
             <!-- Section de prise de rendez-vous -->
-            <div class="section">
+            <section class="section">
                 <h2><i class="fas fa-calendar-plus"></i> Prise de rendez-vous</h2>
                 
                 <div class="booking-container">
@@ -111,7 +438,7 @@
                     <!-- Étape 1: Sélection de la date -->
                     <div id="step1" class="booking-step active">
                         <div class="step-content">
-                            <h3>Choisissez une date</h3>
+                            <h3><i class="fas fa-calendar"></i> Choisissez une date</h3>
                             <p class="step-description">Sélectionnez la date souhaitée pour votre rendez-vous.</p>
                             
                             <div class="calendar-container">
@@ -141,7 +468,7 @@
                     <!-- Étape 2: Sélection de l'horaire -->
                     <div id="step2" class="booking-step">
                         <div class="step-content">
-                            <h3>Choisissez un horaire</h3>
+                            <h3><i class="fas fa-clock"></i> Choisissez un horaire</h3>
                             <p class="step-description">Sélectionnez un horaire disponible pour votre rendez-vous.</p>
                             
                             <div class="time-slots-container">
@@ -173,7 +500,7 @@
                     <!-- Étape 3: Informations patient -->
                     <div id="step3" class="booking-step">
                         <div class="step-content">
-                            <h3>Informations du patient</h3>
+                            <h3><i class="fas fa-user"></i> Informations du patient</h3>
                             <p class="step-description">Veuillez entrer les informations du patient.</p>
                             <div class="form-group">
                                 <label for="patient-name">Nom du patient</label>
@@ -197,7 +524,7 @@
                     <!-- Étape 4: Confirmation -->
                     <div id="step4" class="booking-step">
                         <div class="step-content">
-                            <h3>Confirmez le rendez-vous</h3>
+                            <h3><i class="fas fa-check-circle"></i> Confirmez le rendez-vous</h3>
                             <p class="step-description">Veuillez vérifier les détails de votre rendez-vous.</p>
                             <div class="appointment-summary">
                                 <div class="summary-item">
@@ -224,155 +551,37 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
             <!-- Section Liste des Rendez-vous -->
             <section id="appointment-list" class="section">
-                <h2>Liste des Rendez-vous</h2>
+                <h2><i class="fas fa-calendar-alt"></i> Liste des Rendez-vous</h2>
                 
                 <!-- Recherche de rendez-vous -->
-                <div class="search-box">
-                    <input type="date" id="appointment-date">
-                    <button onclick="searchAppointments()" class="btn btn-primary">
+                <div class="search-section">
+                    <div class="search-box">
+                        <i class="fas fa-calendar-day"></i>
+                        <input type="date" id="appointment-date">
+                    </div>
+                    <button onclick="searchAppointments()" class="search-btn">
                         <i class="fas fa-search"></i> Rechercher les rendez-vous
                     </button>
                 </div>
                 
                 <!-- Liste des rendez-vous -->
-                <div id="appointment-list-results" class="results-container"></div>
+                <div id="appointment-list-results" class="results-section"></div>
 
                 <!-- Rendez-vous du jour -->
                 <div class="today-appointments">
                     <h3><i class="fas fa-calendar-day"></i> Rendez-vous du jour</h3>
-                    <button onclick="loadTodayAppointments()" class="btn btn-info">
-                         Afficher les rendez-vous d'aujourd'hui
+                    <button onclick="loadTodayAppointments()" class="submit-btn">
+                        <i class="fas fa-calendar-check"></i> Afficher les rendez-vous d'aujourd'hui
                     </button>
                     <div id="today-list" class="today-appointments-list"></div>
                 </div>
             </section>
         </main>
     </div>
-
-    <!-- Modal pour modifier un patient -->
-    <div id="patient-modal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <form id="edit-patient-form">
-                <input type="hidden" id="edit-patient-id">
-                <div class="form-group">
-                    <label for="edit-first-name">Prénom</label>
-                    <input type="text" id="edit-first-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-last-name">Nom</label>
-                    <input type="text" id="edit-last-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-phone">Téléphone</label>
-                    <input type="tel" id="edit-phone">
-                </div>
-                <div class="form-group">
-                    <label for="edit-email">Email</label>
-                    <input type="email" id="edit-email">
-                </div>
-                <div class="form-group">
-                    <label for="edit-address">Adresse</label>
-                    <textarea id="edit-address"></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Modifier</button>
-            </form>
-        </div>
-    </div>
-
     <script src="reception.js"></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize FullCalendar
-        var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            locale: 'fr',
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: ''
-            },
-            selectable: true,
-            selectMirror: true,
-            dayMaxEvents: true,
-            select: function(info) {
-                // Update selected date display
-                var selectedDate = info.startStr;
-                document.getElementById('display-selected-date').textContent = 
-                    new Date(selectedDate).toLocaleDateString('fr-FR', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-                
-                // Enable continue button
-                document.getElementById('continue-date-btn').disabled = false;
-                
-                // Store selected date
-                window.selectedAppointmentDate = selectedDate;
-            },
-            // Disable past dates
-            validRange: {
-                start: new Date()
-            },
-            // Customize date cell rendering
-            dayCellDidMount: function(info) {
-                // Add custom class for styling
-                info.el.classList.add('fc-day-custom');
-            }
-        });
-        
-        calendar.render();
-    });
-
-    // Function to handle date selection and move to next step
-    function selectDate() {
-        if (window.selectedAppointmentDate) {
-            // Hide current step
-            document.getElementById('step1').classList.remove('active');
-            // Show next step
-            document.getElementById('step2').classList.add('active');
-            // Update progress bar
-            document.getElementById('progress-step1').classList.add('completed');
-            document.getElementById('progress-step2').classList.add('active');
-        }
-    }
-
-    // Time slot selection
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add click event to time slots
-        const timeSlots = document.querySelectorAll('.time-slot');
-        timeSlots.forEach(slot => {
-            slot.addEventListener('click', function() {
-                // Remove selected class from all slots
-                timeSlots.forEach(s => s.classList.remove('selected'));
-                // Add selected class to clicked slot
-                this.classList.add('selected');
-                // Enable continue button
-                document.getElementById('continue-time-btn').disabled = false;
-                // Store selected time
-                window.selectedAppointmentTime = this.dataset.time;
-            });
-        });
-    });
-
-    function selectTime() {
-        if (window.selectedAppointmentTime) {
-            // Hide current step
-            document.getElementById('step2').classList.remove('active');
-            // Show next step
-            document.getElementById('step3').classList.add('active');
-            // Update progress bar
-            document.getElementById('progress-step2').classList.add('completed');
-            document.getElementById('progress-step3').classList.add('active');
-        }
-    }
-    </script>
 </body>
 </html> 

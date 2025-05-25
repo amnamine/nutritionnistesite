@@ -6,9 +6,6 @@ const logoutBtn = document.getElementById('logout-btn');
 const calendar = document.getElementById('calendar');
 const timeSlots = document.getElementById('time-slots');
 const consultationForm = document.getElementById('consultation-form');
-const historyBtn = document.getElementById('history-btn');
-const historyModal = document.getElementById('history-modal');
-const closeModal = document.querySelector('.close');
 
 // Check authentication status on page load
 document.addEventListener('DOMContentLoaded', async () => {
