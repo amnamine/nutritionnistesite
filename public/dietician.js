@@ -62,6 +62,52 @@ document.addEventListener('DOMContentLoaded', async () => {
             searchResultsDiv.innerHTML = '';
         });
     }
+
+    // Catalogue alimentaire stylé avec images dynamiques
+    const foodCatalog = [
+        { name: 'Pomme', calories: 52, description: 'Riche en fibres et en vitamine C. Idéale pour une collation saine.' },
+        { name: 'Banane', calories: 89, description: 'Source d\'énergie rapide, riche en potassium.' },
+        { name: 'Carotte', calories: 41, description: 'Bonne pour la vue, riche en bêta-carotène.' },
+        { name: 'Poulet grillé', calories: 165, description: 'Excellente source de protéines maigres.' },
+        { name: 'Riz complet', calories: 111, description: 'Riche en fibres, idéal pour l\'énergie durable.' },
+        { name: 'Brocoli', calories: 34, description: 'Très riche en vitamines et minéraux.' },
+        { name: 'Saumon', calories: 208, description: 'Riche en oméga-3, excellent pour le cœur.' },
+        { name: 'Amandes', calories: 579, description: 'Source de bons lipides et de protéines végétales.' },
+        { name: 'Tomate', calories: 18, description: 'Faible en calories, riche en antioxydants.' },
+        { name: 'Yaourt nature', calories: 61, description: 'Bonne source de calcium et de probiotiques.' }
+    ];
+
+    async function renderFoodCatalog() {
+        const foodCatalogGrid = document.getElementById('food-catalog-grid');
+        if (!foodCatalogGrid) return;
+        foodCatalogGrid.innerHTML = '<div style="text-align:center;color:#888;font-size:1.1rem;">Chargement du catalogue...</div>';
+        const cards = await Promise.all(foodCatalog.map(async food => {
+            const img = await fetchFoodImage(food.name);
+            return `
+                <div class="catalog-item food-card-anim" style="border:2.5px solid #5a8dee;border-radius:18px;padding:1.5rem;background:linear-gradient(135deg,#f8f9fa 60%,#eaf1ff 100%);box-shadow:0 4px 18px rgba(90,141,238,0.10);transition:box-shadow 0.25s,transform 0.18s;cursor:pointer;min-width:220px;max-width:260px;display:flex;flex-direction:column;align-items:center;gap:0.5rem;">
+                    <img src="${img}" alt="${food.name}" style="width:90px;height:90px;object-fit:cover;border-radius:14px;margin-bottom:0.7rem;border:2.5px solid #4cd185;background:#fff;box-shadow:0 2px 8px #4cd18522;transition:transform 0.2s;">
+                    <h4 style="color:#5a8dee;font-size:1.15rem;margin-bottom:0.3rem;font-weight:700;letter-spacing:0.5px;">${food.name}</h4>
+                    <p style="color:#4cd185;font-weight:700;margin-bottom:0.2rem;font-size:1.05rem;">${food.calories} kcal / 100g</p>
+                    <p style="color:#343a40;font-size:0.98rem;">${food.description}</p>
+                </div>
+            `;
+        }));
+        foodCatalogGrid.innerHTML = cards.join('');
+        // Animation au survol
+        document.querySelectorAll('.food-card-anim').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-7px) scale(1.04)';
+                card.style.boxShadow = '0 8px 32px #5a8dee33';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
+                card.style.boxShadow = '0 4px 18px rgba(90,141,238,0.10)';
+            });
+        });
+    }
+
+    // Appel au chargement
+    renderFoodCatalog();
 });
 
 function showMainInterface(user) {
@@ -195,4 +241,18 @@ async function loadStatistics() {
     } catch (error) {
         console.error('Erreur chargement statistiques:', error);
     }
+}
+
+// Fonction pour récupérer une image depuis l'API Pixabay
+async function fetchFoodImage(query) {
+    const apiKey = '38201516-2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e'; // Pixabay demo key, à remplacer par une vraie clé si besoin
+    const url = `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(query)}&image_type=photo&per_page=3&category=food`;
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data.hits && data.hits.length > 0) {
+            return data.hits[0].webformatURL;
+        }
+    } catch (e) {}
+    return 'https://cdn.pixabay.com/photo/2017/01/20/15/06/apple-1995056_1280.jpg'; // fallback
 }
