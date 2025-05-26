@@ -313,7 +313,7 @@
 
         .services-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 2.5rem;
             max-width: 1200px;
             margin: 0 auto;
@@ -598,6 +598,17 @@
             }
         }
 
+        @media (max-width: 1100px) {
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 700px) {
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .main-navbar {
             position: fixed;
             top: 0;
@@ -806,6 +817,10 @@
                     current = navLinks[idx];
                 }
             });
+            // Si on est tout en bas de la page (avec une marge d'erreur de 5px), active toujours 'Suivez-nous'
+            if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 5)) {
+                current = navLinks[3];
+            }
             navLinks.forEach(link => link.classList.remove('active'));
             if (current) current.classList.add('active');
 
