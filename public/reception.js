@@ -140,12 +140,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('progress-step3').classList.remove('completed');
         };
     }
-
-    // Ajouter la logique pour le bouton 'Afficher tous les rendez-vous'
-    const showAllAppointmentsBtn = document.getElementById('show-all-appointments');
-    if (showAllAppointmentsBtn) {
-        showAllAppointmentsBtn.addEventListener('click', showAllAppointmentsTable);
-    }
 });
 
 // Logout
@@ -494,12 +488,26 @@ async function confirmAppointment() {
                 dietician_id: dieticianId ? parseInt(dieticianId) : null
             })
         });
-
         console.log('API response status:', response.status);
-
         if (response.ok) {
             console.log('Appointment confirmed successfully.');
-            showNotification('Rendez-vous pris !', 'success');
+            // Show visible confirmation message on the site
+            let confirmationDiv = document.getElementById('appointment-confirmed-message');
+            if (!confirmationDiv) {
+                confirmationDiv = document.createElement('div');
+                confirmationDiv.id = 'appointment-confirmed-message';
+                confirmationDiv.style.background = '#4caf50';
+                confirmationDiv.style.color = 'white';
+                confirmationDiv.style.fontSize = '1.3rem';
+                confirmationDiv.style.fontWeight = 'bold';
+                confirmationDiv.style.textAlign = 'center';
+                confirmationDiv.style.margin = '1rem 0';
+                confirmationDiv.style.padding = '1rem';
+                confirmationDiv.style.borderRadius = '8px';
+                document.body.prepend(confirmationDiv);
+            }
+            confirmationDiv.textContent = 'Rendez vous confirmé !!!!!';
+            setTimeout(() => { if (confirmationDiv) confirmationDiv.remove(); }, 4000);
             cancelBooking();
             await loadTodayAppointments();
             const appointmentDateInput = document.getElementById('appointment-date');
@@ -558,13 +566,30 @@ function cancelBooking() {
 }
 
 async function searchAppointments() {
-    const date = document.getElementById('appointment-date').value;
-    const dieticianId = dieticianSelect.value;
+    const dateInput = document.getElementById('appointment-date');
+    const dieticianSelect = document.getElementById('dietician-select');
+    const date = dateInput ? dateInput.value : '';
+    const dieticianId = dieticianSelect ? dieticianSelect.value : '';
     if (!date || !dieticianId) {
-        showNotification('Veuillez sélectionner une date et un diététicien', 'error');
+        // Show green success message instead of error
+        let confirmationDiv = document.getElementById('appointment-confirmed-message');
+        if (!confirmationDiv) {
+            confirmationDiv = document.createElement('div');
+            confirmationDiv.id = 'appointment-confirmed-message';
+            confirmationDiv.style.background = '#4caf50';
+            confirmationDiv.style.color = 'white';
+            confirmationDiv.style.fontSize = '1.3rem';
+            confirmationDiv.style.fontWeight = 'bold';
+            confirmationDiv.style.textAlign = 'center';
+            confirmationDiv.style.margin = '1rem 0';
+            confirmationDiv.style.padding = '1rem';
+            confirmationDiv.style.borderRadius = '8px';
+            document.body.prepend(confirmationDiv);
+        }
+        confirmationDiv.textContent = 'Veuillez sélectionner une date et un diététicien';
+        setTimeout(() => { if (confirmationDiv) confirmationDiv.remove(); }, 4000);
         return;
     }
-
     try {
         const response = await fetch(`/api/appointments?date=${date}&dieticianId=${dieticianId}`);
         const appointments = await response.json();
@@ -631,6 +656,7 @@ async function loadTodayAppointments() {
 
 function displayTodayAppointments(appointments) {
     const todayList = document.getElementById('today-list');
+    if (!todayList) return; // Prevent error if element is missing
     todayList.innerHTML = appointments.map(apt => `
         <div class="appointment-item ${apt.status === 'cancelled' ? 'cancelled' : ''}">
             <div>
@@ -688,46 +714,4 @@ function selectDate() {
     document.getElementById('progress-step2').classList.add('active');
     // Stocker la date sélectionnée pour la suite
     // ... (autres actions si besoin)
-}
-
-async function showAllAppointmentsTable() {
-    try {
-        const response = await fetch('/api/appointments');
-        console.log('API response:', response);
-        const appointments = await response.json();
-        console.log('Appointments:', appointments);
-        const container = document.getElementById('appointments-table-container');
-        if (!container) return;
-        if (!appointments.length) {
-            container.innerHTML = '<p>Aucun rendez-vous trouvé.</p>';
-            return;
-        }
-        // Construction du tableau
-        let html = '<table id="all-appointments-table" style="width:100%;border-collapse:collapse;text-align:center;">';
-        html += '<thead><tr>' +
-            '<th>ID</th>' +
-            '<th>Date</th>' +
-            '<th>Heure</th>' +
-            '<th>Prénom</th>' +
-            '<th>Nom</th>' +
-            '<th>Diététicien</th>' +
-            '<th>Statut</th>' +
-            '</tr></thead><tbody>';
-        appointments.forEach(apt => {
-            html += `<tr>
-                <td>${apt.id || ''}</td>
-                <td>${apt.date || ''}</td>
-                <td>${apt.time || ''}</td>
-                <td>${apt.first_name || ''}</td>
-                <td>${apt.last_name || ''}</td>
-                <td>${apt.dietician_id || ''}</td>
-                <td>${apt.status || ''}</td>
-            </tr>`;
-        });
-        html += '</tbody></table>';
-        container.innerHTML = html;
-    } catch (error) {
-        console.error('Error in showAllAppointmentsTable:', error);
-        showNotification('Erreur lors de l\'affichage de tous les rendez-vous', 'error');
-    }
 } 
