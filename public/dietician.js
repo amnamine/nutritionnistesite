@@ -2,7 +2,6 @@
 const loginPage = document.getElementById('login-page');
 const mainInterface = document.getElementById('main-interface');
 const userRole = document.getElementById('user-role');
-const logoutBtn = document.getElementById('logout-btn');
 const calendar = document.getElementById('calendar');
 const timeSlots = document.getElementById('time-slots');
 const consultationForm = document.getElementById('consultation-form');
@@ -32,22 +31,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         alert('Erreur JS : ' + error);
         window.location.href = '/login.html';
     }
-});
 
-// Logout
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', async () => {
-        try {
-            await fetch('/api/logout', { 
-                method: 'POST',
-                credentials: 'include' // Important: include credentials in the request
-            });
-            window.location.href = '/login.html';
-        } catch (error) {
-            console.error('Error during logout:', error);
-        }
-    });
-}
+    // Déclarer logoutBtn ici !
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await fetch('/api/logout', { 
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                window.location.href = '/login.html';
+            } catch (error) {
+                console.error('Error during logout:', error);
+            }
+        });
+    }
+});
 
 function showMainInterface(user) {
     if (userRole) {
