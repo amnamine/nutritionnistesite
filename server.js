@@ -403,7 +403,6 @@ app.get('/api/consultations/:patientId', requireAuth, (req, res) => {
 // Statistics routes
 app.get('/api/statistics', requireAuth, requireRole(['admin']), (req, res) => {
     const stats = {};
-    
     // Get user statistics
     db.get('SELECT COUNT(*) as total FROM users', (err, row) => {
         if (err) {
@@ -411,7 +410,7 @@ app.get('/api/statistics', requireAuth, requireRole(['admin']), (req, res) => {
             return;
         }
         stats.totalUsers = row.total;
-        
+        console.log('DEBUG totalUsers:', stats.totalUsers);
         // Get role-based user counts
         db.all('SELECT role, COUNT(*) as count FROM users GROUP BY role', (err, rows) => {
             if (err) {
@@ -419,32 +418,41 @@ app.get('/api/statistics', requireAuth, requireRole(['admin']), (req, res) => {
                 return;
             }
             stats.usersByRole = rows;
-            
-            // Get patient statistics
-            db.get('SELECT COUNT(*) as total FROM patients', (err, row) => {
+            console.log('DEBUG usersByRole:', stats.usersByRole);
+            // Get new users in last 7 days
+            db.get('SELECT COUNT(*) as count FROM users WHERE created_at >= datetime("now", "-7 days")', (err, row) => {
                 if (err) {
                     res.status(500).json({ error: err.message });
                     return;
                 }
-                stats.totalPatients = row.total;
-                
-                // Get patient status counts
-                db.all('SELECT status, COUNT(*) as count FROM patients GROUP BY status', (err, rows) => {
+                stats.newUsers7d = (row && row.count) || 0;
+                console.log('DEBUG newUsers7d:', stats.newUsers7d);
+                // Get patient statistics
+                db.get('SELECT COUNT(*) as total FROM patients', (err, row) => {
                     if (err) {
                         res.status(500).json({ error: err.message });
                         return;
                     }
-                    stats.patientsByStatus = rows;
-                    
-                    // Get appointment statistics
-                    db.get('SELECT COUNT(*) as total FROM appointments', (err, row) => {
+                    stats.totalPatients = row.total;
+                    console.log('DEBUG totalPatients:', stats.totalPatients);
+                    // Get patient status counts
+                    db.all('SELECT status, COUNT(*) as count FROM patients GROUP BY status', (err, rows) => {
                         if (err) {
                             res.status(500).json({ error: err.message });
                             return;
                         }
-                        stats.totalAppointments = row.total;
-                        
-                        res.json(stats);
+                        stats.patientsByStatus = rows;
+                        console.log('DEBUG patientsByStatus:', stats.patientsByStatus);
+                        // Get appointment statistics
+                        db.get('SELECT COUNT(*) as total FROM appointments', (err, row) => {
+                            if (err) {
+                                res.status(500).json({ error: err.message });
+                                return;
+                            }
+                            stats.totalAppointments = row.total;
+                            console.log('DEBUG totalAppointments:', stats.totalAppointments);
+                            res.json(stats);
+                        });
                     });
                 });
             });

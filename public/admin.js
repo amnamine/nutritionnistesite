@@ -31,6 +31,7 @@ async function loadStatistics() {
         const response = await fetch('/api/statistics');
         if (!response.ok) throw new Error('Erreur lors du chargement des statistiques');
         const stats = await response.json();
+        console.log('STATS DEBUG:', stats);
         // Mettre à jour les compteurs
         document.getElementById('stat-total-users').textContent = stats.totalUsers || 0;
         // Initialiser à 0
