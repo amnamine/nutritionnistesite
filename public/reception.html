@@ -375,8 +375,18 @@
                     </button>
                 </div>
                 
+                <!-- Boutons toujours visibles pour afficher/cacher la liste des patients -->
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem; justify-content: flex-end;">
+                    <button id="hide-patient-list" class="submit-btn">
+                        <i class="fas fa-users-slash"></i> Cacher patients
+                    </button>
+                    <button id="show-patient-list" class="submit-btn">
+                        <i class="fas fa-users"></i> Afficher patients
+                    </button>
+                </div>
+                
                 <!-- Résultats de recherche -->
-                <div id="search-results" class="results-section patient-list-vertical"></div>
+                <div id="search-results" class="results-section patient-list-vertical" style="display: none;"></div>
                 
                 <!-- Formulaire d'ajout de patient -->
                 <div class="form-section">
@@ -386,7 +396,7 @@
                     
                     <form id="patient-form" style="display: none;">
                         <h3><i class="fas fa-user-plus"></i> Nouveau Patient</h3>
-                        <div class="form-grid">
+                        <div class="form-grid" style="display: flex; flex-direction: column; gap: 1rem;">
                             <div class="form-group">
                                 <label for="first-name">Prénom</label>
                                 <input type="text" id="first-name" required>

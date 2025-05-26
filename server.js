@@ -274,7 +274,7 @@ app.get('/api/patients', requireAuth, (req, res) => {
     
     let query = 'SELECT * FROM patients WHERE (first_name LIKE ? OR last_name LIKE ?)';
     if (!includeArchived) {
-        query += ' AND status = "active"';
+        query += ' AND (archived = 0 OR archived IS NULL)';
     }
     
     db.all(query, [`%${search}%`, `%${search}%`], (err, rows) => {

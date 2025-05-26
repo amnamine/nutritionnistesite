@@ -10,6 +10,13 @@ const showAddPatientBtn = document.getElementById('show-add-patient');
 const dieticianSelect = document.getElementById('dietician-select');
 const patientModal = document.getElementById('patient-modal');
 const closeModal = document.querySelector('.close');
+const togglePatientListBtn = document.getElementById('toggle-patient-list');
+const searchResultsDiv = document.getElementById('search-results');
+const showPatientListBtn = document.getElementById('show-patient-list');
+const hidePatientListBtn = document.getElementById('hide-patient-list');
+
+// Variable globale pour l'état d'affichage de la liste des patients
+window.patientListVisible = false;
 
 // Check authentication status on page load
 document.addEventListener('DOMContentLoaded', async () => {
@@ -34,6 +41,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
         console.error('Error checking auth status:', error);
         window.location.href = '/login.html';
+    }
+
+    // Bouton pour afficher/cacher la liste des patients (doit être dans le DOMContentLoaded)
+    if (showPatientListBtn && hidePatientListBtn && searchResultsDiv) {
+        showPatientListBtn.addEventListener('click', () => {
+            if (!window.patientListVisible) {
+                window.patientListVisible = true;
+                searchResultsDiv.style.display = 'block';
+                searchPatient();
+            }
+        });
+        hidePatientListBtn.addEventListener('click', () => {
+            window.patientListVisible = false;
+            searchResultsDiv.style.display = 'none';
+            searchResultsDiv.innerHTML = '';
+        });
     }
 });
 
@@ -94,6 +117,11 @@ async function searchPatient() {
 
 function displayPatients(patients) {
     const resultsDiv = document.getElementById('search-results');
+    if (!window.patientListVisible) {
+        resultsDiv.style.display = 'none';
+        resultsDiv.innerHTML = '';
+        return;
+    }
     resultsDiv.innerHTML = patients.map(patient => `
         <div class="patient-card">
             <h3>${patient.first_name} ${patient.last_name}</h3>
