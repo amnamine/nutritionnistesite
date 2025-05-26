@@ -491,24 +491,14 @@ async function confirmAppointment() {
         console.log('API response status:', response.status);
         if (response.ok) {
             console.log('Appointment confirmed successfully.');
-            // Show visible confirmation message on the site
-            let confirmationDiv = document.getElementById('appointment-confirmed-message');
-            if (!confirmationDiv) {
-                confirmationDiv = document.createElement('div');
-                confirmationDiv.id = 'appointment-confirmed-message';
-                confirmationDiv.style.background = '#4caf50';
-                confirmationDiv.style.color = 'white';
-                confirmationDiv.style.fontSize = '1.3rem';
-                confirmationDiv.style.fontWeight = 'bold';
-                confirmationDiv.style.textAlign = 'center';
-                confirmationDiv.style.margin = '1rem 0';
-                confirmationDiv.style.padding = '1rem';
-                confirmationDiv.style.borderRadius = '8px';
-                document.body.prepend(confirmationDiv);
-            }
-            confirmationDiv.textContent = 'Rendez vous confirmé !!!!!';
-            setTimeout(() => { if (confirmationDiv) confirmationDiv.remove(); }, 4000);
-            cancelBooking();
+            // Show the styled confirmation step (step5)
+            document.querySelectorAll('.booking-step').forEach(step => step.classList.remove('active'));
+            const step5 = document.getElementById('step5');
+            if (step5) step5.classList.add('active');
+            // Optionally, update progress bar
+            document.querySelectorAll('.progress-step').forEach(step => step.classList.remove('active', 'completed'));
+            const progressStep5 = document.getElementById('progress-step5');
+            if (progressStep5) progressStep5.classList.add('active', 'completed');
             await loadTodayAppointments();
             const appointmentDateInput = document.getElementById('appointment-date');
             if (appointmentDateInput) appointmentDateInput.value = date;
