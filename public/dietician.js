@@ -12,11 +12,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const response = await fetch('/api/me', {
             credentials: 'include' // Important: include credentials in the request
         });
-        console.log('API /api/me response:', response);
         if (response.ok) {
             const user = await response.json();
-            console.log('Current user:', user); // Debug log
-            alert('DEBUG USER: ' + JSON.stringify(user));
             if (user.role && user.role.trim().toLowerCase() === 'dieteticien') {
                 showMainInterface(user);
             } else {
@@ -35,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Déclarer logoutBtn ici !
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
+        logoutBtn.onclick = async () => {
             try {
                 await fetch('/api/logout', { 
                     method: 'POST',
@@ -43,9 +40,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
                 window.location.href = '/login.html';
             } catch (error) {
+                alert('Erreur lors de la déconnexion !');
                 console.error('Error during logout:', error);
+                window.location.reload(); // Fallback
             }
-        });
+        };
+    } else {
+        alert('logoutBtn introuvable !');
+        console.log('logoutBtn introuvable !');
     }
 });
 
@@ -143,3 +145,38 @@ async function showTimeSlots(date) {
 
 function displayTimeSlots(slots, date) {
     timeSlots.innerHTML = slots.map(slot => `
+        <div class="time-slot${slot.isBooked ? ' unavailable' : ''}">
+            ${slot.time} ${slot.isBooked ? '(Réservé)' : ''}
+        </div>
+    `).join('');
+}
+
+// Ajout de la fonction pour corriger l'erreur ReferenceError
+async function loadTodayAppointments() {
+    // Récupère les rendez-vous du jour pour ce diététicien (affichage à compléter selon besoin)
+    try {
+        const today = new Date().toISOString().split('T')[0];
+        // On suppose que l'utilisateur connecté est diététicien
+        const response = await fetch(`/api/appointments?date=${today}`);
+        if (!response.ok) throw new Error('Erreur lors du chargement des rendez-vous du jour');
+        const appointments = await response.json();
+        // Tu peux ici afficher les rendez-vous dans le DOM si besoin
+        console.log('Rendez-vous du jour:', appointments);
+    } catch (error) {
+        console.error('Erreur chargement rendez-vous du jour:', error);
+    }
+}
+
+// Ajout de la fonction pour corriger l'erreur ReferenceError
+async function loadStatistics() {
+    // Récupère les statistiques pour le diététicien (affichage à compléter selon besoin)
+    try {
+        const response = await fetch('/api/statistics');
+        if (!response.ok) throw new Error('Erreur lors du chargement des statistiques');
+        const stats = await response.json();
+        // Tu peux ici afficher les statistiques dans le DOM si besoin
+        console.log('Statistiques:', stats);
+    } catch (error) {
+        console.error('Erreur chargement statistiques:', error);
+    }
+}
