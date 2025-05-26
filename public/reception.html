@@ -488,22 +488,22 @@
                         <div class="step-content">
                             <h3><i class="fas fa-clock"></i> Choisissez un horaire</h3>
                             <p class="step-description">Sélectionnez un horaire disponible pour votre rendez-vous.</p>
-                            
                             <div class="time-slots-container">
-                                <div class="time-slots-list">
-                                    <button class="time-slot" data-time="08:00">8h00</button>
-                                    <button class="time-slot" data-time="09:00">9h00</button>
-                                    <button class="time-slot" data-time="10:00">10h00</button>
-                                    <button class="time-slot" data-time="11:00">11h00</button>
-                                    <button class="time-slot" data-time="12:00">12h00</button>
-                                    <button class="time-slot" data-time="13:00">13h00</button>
-                                    <button class="time-slot" data-time="14:00">14h00</button>
-                                    <button class="time-slot" data-time="15:00">15h00</button>
-                                    <button class="time-slot" data-time="16:00">16h00</button>
-                                    <button class="time-slot" data-time="17:00">17h00</button>
-                                </div>
+                                <label for="time-slot-select" style="font-weight:500; margin-bottom:0.5rem;">Horaire disponible :</label>
+                                <select id="time-slot-select" class="form-control" style="font-size:1.2rem; padding:0.5rem 1rem; border-radius:8px; border:1px solid #bfc4d1;">
+                                    <option value="">-- Sélectionner un horaire --</option>
+                                    <option value="08:00">8h00</option>
+                                    <option value="09:00">9h00</option>
+                                    <option value="10:00">10h00</option>
+                                    <option value="11:00">11h00</option>
+                                    <option value="12:00">12h00</option>
+                                    <option value="13:00">13h00</option>
+                                    <option value="14:00">14h00</option>
+                                    <option value="15:00">15h00</option>
+                                    <option value="16:00">16h00</option>
+                                    <option value="17:00">17h00</option>
+                                </select>
                             </div>
-
                             <div class="step-actions">
                                 <button onclick="previousStep(2)" class="btn-back">
                                     <i class="fas fa-arrow-left"></i> Retour

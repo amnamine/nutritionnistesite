@@ -77,6 +77,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         calendarObj.render();
     }
+
+    // Nouvelle logique pour le menu déroulant d'horaire
+    const timeSlotSelect = document.getElementById('time-slot-select');
+    const continueTimeBtn = document.getElementById('continue-time-btn');
+    if (timeSlotSelect && continueTimeBtn) {
+        timeSlotSelect.addEventListener('change', () => {
+            window.selectedAppointmentTime = timeSlotSelect.value;
+            continueTimeBtn.disabled = !window.selectedAppointmentTime;
+        });
+    }
 });
 
 // Logout
@@ -305,10 +315,24 @@ function selectTimeSlot(date, time, dieticianId) {
         });
         // Add selection to clicked slot
         selectedSlot.classList.add('selected');
-        
-        // Show simple validation form
-        showValidationForm(date, time, dieticianId);
+        // Stocker l'horaire sélectionné
+        window.selectedAppointmentTime = time;
+        // Activer le bouton Continuer
+        const continueTimeBtn = document.getElementById('continue-time-btn');
+        if (continueTimeBtn) continueTimeBtn.disabled = false;
     }
+}
+
+// Fonction pour passer à l'étape suivante après sélection de l'horaire
+function selectTime() {
+    if (!window.selectedAppointmentTime) {
+        showNotification('Veuillez sélectionner un horaire', 'error');
+        return;
+    }
+    document.getElementById('step2').classList.remove('active');
+    document.getElementById('step3').classList.add('active');
+    document.getElementById('progress-step2').classList.add('completed');
+    document.getElementById('progress-step3').classList.add('active');
 }
 
 function showValidationForm(date, time, dieticianId) {
