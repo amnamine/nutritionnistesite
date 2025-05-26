@@ -3,252 +3,831 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cabinet de Diététique</title>
+    <title>Cabinet de Diététique - Votre Partenaire Santé</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* General body styling */
-        body.landing {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); /* Updated gradient */
-            display: flex;
-            flex-direction: column;
-            font-family: 'Poppins', sans-serif; /* Ensure Poppins is applied */
-            color: #333; /* Default text color */
-            line-height: 1.6;
-            overflow-x: hidden; /* Prevent horizontal scroll */
+        :root {
+            --primary-color: #4A90E2;
+            --primary-dark: #357ABD;
+            --secondary-color: #50C878;
+            --secondary-dark: #3DA066;
+            --accent-color: #FF6B6B;
+            --accent-dark: #E55A5A;
+            --text-color: #2C3E50;
+            --text-light: #5D6D7E;
+            --light-bg: #F8F9FA;
+            --white: #FFFFFF;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            --gradient-accent: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-dark) 100%);
+            --transition-fast: all 0.3s ease;
+            --transition-slow: all 0.5s ease;
+            --border-radius-sm: 8px;
+            --border-radius-md: 15px;
+            --border-radius-lg: 25px;
         }
 
-        /* Navigation bar styling */
-        .landing-nav {
-            background: rgba(255, 255, 255, 0.9); /* Slightly transparent white background */
-            backdrop-filter: blur(10px); /* Blur effect */
-            padding: 1rem 2.5rem; /* Adjusted padding */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--light-bg);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-md);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-            position: fixed; /* Fixed navigation */
+            backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .navbar.scrolled {
+            padding: 0.8rem 5%;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            text-decoration: none;
+            color: var(--primary-color);
+            font-size: 1.6rem;
+            font-weight: 700;
+            transition: var(--transition-fast);
+        }
+
+        .logo:hover {
+            transform: scale(1.05) rotate(-2deg);
+        }
+
+        .logo i {
+            color: var(--secondary-color);
+            font-size: 1.8rem;
+            animation: pulse 2s infinite;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1.2rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.8rem;
+            border-radius: var(--border-radius-lg);
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            position: relative;
+            overflow: hidden;
+            background-size: 200% 100%;
+            animation: glow 3s infinite;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
             width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                120deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transition: var(--transition-fast);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: var(--white);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--gradient-accent);
+            color: var(--white);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 10rem 5% 6rem;
+            background: var(--gradient-primary);
+            color: var(--white);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
             top: 0;
             left: 0;
-            z-index: 1000; /* Ensure it's on top */
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.1) 100%);
+            animation: pulse 4s infinite;
         }
 
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem; /* Adjusted gap */
-            font-size: 1.8rem; /* Slightly smaller font */
-            font-weight: 700;
-            color: #333; /* Darker brand color */
-            text-decoration: none; /* Remove underline */
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.1) 100%);
+            animation: pulse 4s infinite;
         }
 
-        .nav-brand i {
-            color: #ff6b6b; /* Accent color */
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 1s ease, float 6s ease-in-out infinite;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
         }
 
-        .landing-login-btn {
-            background: #007bff; /* Primary button color */
-            color: white; /* White text */
-            border: none;
-            border-radius: 25px; /* More rounded */
-            padding: 0.6rem 1.8rem; /* Adjusted padding */
-            font-size: 1rem; /* Slightly smaller font */
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease; /* Smooth transitions */
-            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2); /* Button shadow */
+        .hero p {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto 2.5rem;
+            animation: fadeInUp 1s ease 0.2s, float 6s ease-in-out infinite 0.5s;
+            opacity: 0;
+            animation-fill-mode: forwards;
+            line-height: 1.8;
         }
 
-        .landing-login-btn:hover {
-            background: #0056b3; /* Darker shade on hover */
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+        /* Features Section */
+        .features {
+            padding: 6rem 5%;
+            background: var(--white);
+            position: relative;
         }
 
-        /* Hero section styling */
-        .landing-hero {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+        .section-title {
             text-align: center;
-            color: #fff; /* White text for contrast */
-            padding: 8rem 1rem 4rem 1rem; /* Adjusted padding to accommodate fixed nav */
-            position: relative; /* Needed for potential background elements */
+            margin-bottom: 4rem;
+            color: var(--text-color);
+            font-size: 2.5rem;
+            position: relative;
+            padding-bottom: 1rem;
+            overflow: hidden;
         }
 
-        .landing-hero h1 {
-            font-size: 3rem; /* Adjusted font size */
-            font-weight: 700;
-            margin-bottom: 1rem;
-            letter-spacing: 0.5px;
-            text-shadow: 0 3px 15px rgba(0,0,0,0.2);
-            animation: fadeInUp 0.8s ease-out; /* Animation */
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--gradient-primary);
+            border-radius: 2px;
+            animation: shine 3s infinite;
         }
 
-        .landing-hero p {
-            font-size: 1.2rem; /* Adjusted font size */
-            font-weight: 400;
-            margin-bottom: 2rem;
-            color: rgba(255, 255, 255, 0.9); /* Slightly transparent white */
-            max-width: 700px; /* Limit width for readability */
-            animation: fadeInUp 1s ease-out 0.2s; /* Animation with delay */
-        }
-
-        .landing-cta-btn {
-            background: #ff6b6b; /* Accent color for CTA */
-            color: white; /* White text */
-            font-size: 1.1rem; /* Adjusted font size */
-            font-weight: 600;
-            padding: 0.9rem 2.2rem; /* Adjusted padding */
-            border: none;
-            border-radius: 25px; /* More rounded */
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3); /* CTA button shadow */
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease; /* Smooth transitions */
-            animation: bounceIn 1s ease-out 0.4s; /* Animation with delay */
-        }
-
-        .landing-cta-btn:hover {
-            background: #ff4c4c; /* Darker accent on hover */
-            transform: translateY(-3px) scale(1.05); /* More pronounced hover effect */
-            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
-        }
-
-        /* Features section styling */
-        .landing-features {
-            display: flex;
-            justify-content: center;
-            gap: 2rem; /* Adjusted gap */
-            margin-bottom: 4rem; /* Increased bottom margin */
-            flex-wrap: wrap;
-            padding: 0 1rem; /* Add horizontal padding */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .feature-card {
-            background: #ffffff; /* Pure white background */
-            border-radius: 12px; /* Less rounded corners */
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Improved shadow */
-            padding: 2rem; /* Adjusted padding */
-            min-width: 280px; /* Increased min-width */
-            max-width: 350px; /* Increased max-width */
-            width: 100%; /* Allow card to take full width on small screens */
-            margin: 0.7rem 0; /* Adjusted margin */
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-fast);
             text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
-            border: 1px solid #e0e0e0; /* Subtle border */
-            animation: fadeInUp 0.6s ease-out var(--animation-delay); /* Animation with staggered delay */
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            animation: scaleIn 0.6s ease-out;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            transform: translateX(-100%);
+            transition: transform 0.6s;
         }
 
         .feature-card:hover {
-            transform: translateY(-8px) scale(1.04); /* More pronounced hover effect */
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15); /* Stronger shadow on hover */
+            transform: translateY(-15px) scale(1.02);
         }
 
-        .feature-card i {
-            font-size: 3rem; /* Larger icon size */
-            color: #007bff; /* Primary color for icons */
-            margin-bottom: 1.2rem; /* Increased bottom margin */
+        .feature-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+            transition: var(--transition-fast);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .feature-card:hover .feature-icon {
+            animation: pulse 1s infinite;
+            color: var(--secondary-color);
         }
 
         .feature-card h3 {
-            color: #333; /* Darker heading color */
-            font-size: 1.4rem; /* Adjusted font size */
-            font-weight: 600;
-            margin-bottom: 0.6rem; /* Adjusted margin */
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+            font-size: 1.5rem;
         }
 
         .feature-card p {
-            color: #555; /* Slightly darker text color */
-            font-size: 1.05rem; /* Adjusted font size */
+            color: var(--text-light);
+            position: relative;
+            z-index: 1;
+            font-size: 1.1rem;
+            line-height: 1.7;
         }
 
-        /* Footer styling */
-        .landing-footer {
-            background: #333; /* Dark background */
-            color: #e0e0e0; /* Light text color */
-            text-align: center;
-            padding: 1.5rem 1rem; /* Adjusted padding */
-            font-size: 0.95rem;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* Subtle top shadow */
+        /* Services Section */
+        .services {
+            padding: 6rem 5%;
+            background: var(--light-bg);
+            position: relative;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .service-card {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+            animation: slideInLeft 0.6s ease-out;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .service-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: var(--transition-fast);
+            transform-origin: left;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px) scale(1.02);
+        }
+
+        .service-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .service-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            font-size: 1.4rem;
+        }
+
+        .service-card h3 i {
+            color: var(--primary-color);
+            font-size: 1.6rem;
+            transition: var(--transition-fast);
+            animation: pulse 2s infinite;
+        }
+
+        .service-card:hover h3 i {
+            animation: pulse 1s infinite;
+            color: var(--secondary-color);
+        }
+
+        .service-card p {
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--text-color);
+            color: var(--white);
+            padding: 4rem 5% 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-section {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .footer-section:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .footer-section:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1.5rem;
+            color: var(--secondary-color);
+            font-size: 1.4rem;
+            position: relative;
+            padding-bottom: 0.8rem;
+        }
+
+        .footer-section h3::after {
+            display: none !important;
+        }
+
+        .footer-section p {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: var(--transition-fast);
+        }
+
+        .footer-section p:hover {
+            transform: translateX(10px);
+            color: var(--secondary-color);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-links a {
+            color: var(--white);
+            font-size: 1.8rem;
+            transition: var(--transition-fast);
+            position: relative;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .social-links a::before {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: scale(0);
+            transition: var(--transition-fast);
+            z-index: -1;
+        }
+
+        .social-links a:hover {
+            transform: translateY(-5px) scale(1.2);
+            color: var(--secondary-color);
+        }
+
+        .social-links a:hover::before {
+            transform: scale(1);
+        }
+
+        .social-links a:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        .social-links a:nth-child(3) {
+            animation-delay: 1s;
+        }
+
+        .social-links a:nth-child(4) {
+            animation-delay: 1.5s;
         }
 
         /* Animations */
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        @keyframes bounceIn {
-            0% { transform: scale(0.1); opacity: 0; }
-            60% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(1); }
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
         }
 
-        /* Responsive adjustments */
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes shine {
+            0% { background-position: -100% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @keyframes scaleIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes slideInLeft {
+            0% { transform: translateX(-50px); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInRight {
+            0% { transform: translateX(50px); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(74, 144, 226, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(74, 144, 226, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(74, 144, 226, 0.5); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            
+            .navbar {
+                padding: 1rem;
+            }
+
+            .nav-buttons {
+                gap: 0.8rem;
+            }
+
+            .btn {
+                padding: 0.7rem 1.4rem;
+                font-size: 0.9rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .feature-card, .service-card {
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .features-grid, .services-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .main-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 2000;
+            background: rgba(255,255,255,0.97);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 5%;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 2.5rem;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links li a {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: color 0.2s;
+            position: relative;
+        }
+
+        .nav-links li a::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 2px;
+            background: var(--secondary-color);
+            transition: width 0.3s;
+            margin: 0 auto;
+        }
+
+        .nav-links li a:hover,
+        .nav-links li a.active {
+            color: var(--secondary-color);
+        }
+
+        .nav-links li a:hover::after,
+        .nav-links li a.active::after {
+            width: 100%;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         @media (max-width: 900px) {
-            .landing-nav { flex-direction: column; gap: 1rem; padding: 1rem; }
-            .landing-hero { padding-top: 6rem; }
-            .landing-features { gap: 1.5rem; }
-            .feature-card { max-width: 90%; }
-        }
-
-        @media (max-width: 600px) {
-            .landing-hero h1 { font-size: 2.5rem; }
-            .landing-hero p { font-size: 1.1rem; }
-            .landing-cta-btn { font-size: 1rem; padding: 0.8rem 2rem; }
-            .feature-card { min-width: unset; }
+            .nav-links {
+                gap: 1.2rem;
+            }
+            .main-navbar {
+                padding: 1rem 1.5rem;
+            }
         }
     </style>
 </head>
-<body class="landing">
-    <nav class="landing-nav">
-        <a href="#" class="nav-brand">
+<body>
+    <nav class="navbar main-navbar">
+        <a href="#description" class="logo">
             <i class="fas fa-heartbeat"></i>
             <span>Cabinet de Diététique</span>
         </a>
-        <button class="landing-login-btn" onclick="showLoginPage()">
-            <i class="fas fa-sign-in-alt"></i>
-            Connexion
-        </button>
+        <ul class="nav-links">
+            <li><a href="#description">Description</a></li>
+            <li><a href="#services">Nos Services</a></li>
+            <li><a href="#pourquoi">Pourquoi</a></li>
+            <li><a href="#suivez-nous">Suivez-nous</a></li>
+        </ul>
+        <div class="nav-buttons">
+            <a href="/login.html" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt"></i>
+                Connexion
+            </a>
+        </div>
     </nav>
-    <div class="landing-hero">
+
+    <section class="hero" id="description">
         <h1>Votre Partenaire Santé et Bien-être</h1>
-        <p>Découvrez une nouvelle approche pour une vie saine. Notre cabinet de diététique vous accompagne avec des solutions personnalisées pour atteindre vos objectifs.</p>
-        <button class="landing-cta-btn" onclick="showLoginPage()">
+        <p>Découvrez une approche personnalisée de la nutrition avec notre équipe de diététiciens experts. Nous vous accompagnons dans votre parcours vers une vie plus saine et équilibrée.</p>
+        <a href="/login.html" class="btn btn-secondary">
             <i class="fas fa-arrow-right"></i>
             Commencer maintenant
-        </button>
-        <div class="landing-features">
-            <div class="feature-card" style="--animation-delay: 0s;">
-                <i class="fas fa-users"></i>
-                <h3>Suivi Personnalisé</h3>
-                <p>Programmes nutritionnels adaptés à vos besoins et un accompagnement expert à chaque étape.</p>
+        </a>
+    </section>
+
+    <section class="features" id="services">
+        <h2 class="section-title">Nos Services</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fas fa-user-md feature-icon"></i>
+                <h3>Consultations Personnalisées</h3>
+                <p>Bénéficiez d'un suivi nutritionnel sur mesure, adapté à vos besoins spécifiques et objectifs personnels.</p>
             </div>
-            <div class="feature-card" style="--animation-delay: 0.2s;">
-                <i class="fas fa-calendar-alt"></i>
-                <h3>Prise de Rendez-vous Facile</h3>
-                <p>Planifiez vos consultations en ligne, rapidement et simplement, selon vos disponibilités.</p>
+            <div class="feature-card">
+                <i class="fas fa-calendar-check feature-icon"></i>
+                <h3>Rendez-vous en Ligne</h3>
+                <p>Planifiez vos consultations en quelques clics, selon vos disponibilités et préférences.</p>
             </div>
-            <div class="feature-card" style="--animation-delay: 0.4s;">
-                <i class="fas fa-chart-line"></i>
-                <h3>Gestion Complète</h3>
-                <p>Pour les professionnels: gérez patients, rendez-vous et statistiques efficacement.</p>
+            <div class="feature-card">
+                <i class="fas fa-chart-line feature-icon"></i>
+                <h3>Suivi de Progrès</h3>
+                <p>Visualisez votre évolution grâce à nos outils de suivi performants et intuitifs.</p>
             </div>
         </div>
-    </div>
-    <footer class="landing-footer">
-        <p>&copy; 2024 Cabinet de Diététique. Tous droits réservés.</p>
+    </section>
+
+    <section class="services" id="pourquoi">
+        <h2 class="section-title">Pourquoi Nous Choisir ?</h2>
+        <div class="services-grid">
+            <div class="service-card">
+                <h3><i class="fas fa-check-circle"></i> Expertise Professionnelle</h3>
+                <p>Une équipe de diététiciens qualifiés et expérimentés à votre service.</p>
+            </div>
+            <div class="service-card">
+                <h3><i class="fas fa-clock"></i> Flexibilité</h3>
+                <p>Des horaires adaptés à votre emploi du temps et votre mode de vie.</p>
+            </div>
+            <div class="service-card">
+                <h3><i class="fas fa-lock"></i> Confidentialité</h3>
+                <p>Vos données personnelles sont protégées et sécurisées avec la plus grande attention.</p>
+            </div>
+            <div class="service-card">
+                <h3><i class="fas fa-comments"></i> Support Continu</h3>
+                <p>Un accompagnement personnalisé et un suivi régulier à chaque étape de votre parcours.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer" id="suivez-nous">
+        <div class="footer-content" style="display: flex; justify-content: center; align-items: center; width: 100%; text-align: center;">
+            <div class="footer-section" style="width: 100%; max-width: 600px; margin: 0 auto;">
+                <h3 style="font-size: 2.2rem; margin-bottom: 2rem;">Suivez-nous</h3>
+                <div class="social-links" style="display: flex; justify-content: center; align-items: center; gap: 2rem;">
+                    <a href="https://www.facebook.com" target="_blank"><i class="fab fa-facebook" style="font-size: 2.5rem;"></i></a>
+                    <a href="https://www.twitter.com" target="_blank"><i class="fab fa-twitter" style="font-size: 2.5rem;"></i></a>
+                    <a href="https://www.instagram.com" target="_blank"><i class="fab fa-instagram" style="font-size: 2.5rem;"></i></a>
+                    <a href="https://www.linkedin.com" target="_blank"><i class="fab fa-linkedin" style="font-size: 2.5rem;"></i></a>
+                </div>
+            </div>
+        </div>
+        <p style="margin-top: 3rem; text-align: center; opacity: 0.8;">&copy; 2025 Cabinet de Diététique. Tous droits réservés.</p>
     </footer>
+
     <script>
-        function showLoginPage() {
-            window.location.href = '/login.html';
-        }
+        // Amélioration des animations au défilement
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    if (entry.target.classList.contains('feature-card')) {
+                        entry.target.style.animation = 'scaleIn 0.6s ease-out';
+                    } else if (entry.target.classList.contains('service-card')) {
+                        entry.target.style.animation = entry.target.dataset.index % 2 === 0 ? 
+                            'slideInLeft 0.6s ease-out' : 'slideInRight 0.6s ease-out';
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Animation des éléments au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.feature-card, .service-card').forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.dataset.index = index;
+                observer.observe(card);
+            });
+
+            // Animation du hero
+            const hero = document.querySelector('.hero');
+            hero.style.opacity = '0';
+            setTimeout(() => {
+                hero.style.transition = 'opacity 1s ease';
+                hero.style.opacity = '1';
+            }, 100);
+        });
+
+        // Ajout de la gestion de l'état actif sur les liens de navigation
+        window.addEventListener('scroll', function() {
+            const sections = [
+                document.getElementById('description'),
+                document.getElementById('services'),
+                document.getElementById('pourquoi'),
+                document.getElementById('suivez-nous')
+            ];
+            const navLinks = document.querySelectorAll('.nav-links a');
+            let current = '';
+            sections.forEach((section, idx) => {
+                if (section && window.scrollY + 120 >= section.offsetTop) {
+                    current = navLinks[idx];
+                }
+            });
+            navLinks.forEach(link => link.classList.remove('active'));
+            if (current) current.classList.add('active');
+
+            // Effet d'ombre/fond uniquement
+            const navbar = document.querySelector('.main-navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Animation des boutons
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('mouseover', () => {
+                btn.style.transform = 'translateY(-3px) scale(1.05)';
+            });
+
+            btn.addEventListener('mouseout', () => {
+                btn.style.transform = 'translateY(0) scale(1)';
+            });
+        });
     </script>
 </body>
 </html> 
