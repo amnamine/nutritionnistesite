@@ -93,4 +93,33 @@ if (logoutBtn) {
             console.error('Error during logout:', error);
         }
     });
+}
+
+// Gestion du formulaire d'ajout d'utilisateur
+const addUserForm = document.getElementById('add-user-form');
+if (addUserForm) {
+    addUserForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('new-username').value;
+        const password = document.getElementById('new-password').value;
+        const role = document.getElementById('new-role').value;
+        try {
+            const response = await fetch('/api/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, role })
+            });
+            if (response.ok) {
+                addUserForm.reset();
+                loadUsers();
+                if (window.showNotification) window.showNotification('Utilisateur ajouté avec succès', 'success');
+            } else {
+                const error = await response.json();
+                if (window.showNotification) window.showNotification(error.error || 'Erreur lors de l\'ajout', 'error');
+            }
+        } catch (error) {
+            if (window.showNotification) window.showNotification('Erreur lors de l\'ajout', 'error');
+            console.error('Erreur ajout utilisateur:', error);
+        }
+    });
 } 
