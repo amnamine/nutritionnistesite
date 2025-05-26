@@ -410,7 +410,6 @@ app.get('/api/statistics', requireAuth, requireRole(['admin']), (req, res) => {
             return;
         }
         stats.totalUsers = row.total;
-        console.log('DEBUG totalUsers:', stats.totalUsers);
         // Get role-based user counts
         db.all('SELECT role, COUNT(*) as count FROM users GROUP BY role', (err, rows) => {
             if (err) {
@@ -418,7 +417,6 @@ app.get('/api/statistics', requireAuth, requireRole(['admin']), (req, res) => {
                 return;
             }
             stats.usersByRole = rows;
-            console.log('DEBUG usersByRole:', stats.usersByRole);
             // Get new users in last 7 days
             db.get('SELECT COUNT(*) as count FROM users WHERE created_at >= datetime("now", "-7 days")', (err, row) => {
                 if (err) {
@@ -426,7 +424,6 @@ app.get('/api/statistics', requireAuth, requireRole(['admin']), (req, res) => {
                     return;
                 }
                 stats.newUsers7d = (row && row.count) || 0;
-                console.log('DEBUG newUsers7d:', stats.newUsers7d);
                 // Get patient statistics
                 db.get('SELECT COUNT(*) as total FROM patients', (err, row) => {
                     if (err) {
@@ -434,7 +431,6 @@ app.get('/api/statistics', requireAuth, requireRole(['admin']), (req, res) => {
                         return;
                     }
                     stats.totalPatients = row.total;
-                    console.log('DEBUG totalPatients:', stats.totalPatients);
                     // Get patient status counts
                     db.all('SELECT status, COUNT(*) as count FROM patients GROUP BY status', (err, rows) => {
                         if (err) {
@@ -442,7 +438,6 @@ app.get('/api/statistics', requireAuth, requireRole(['admin']), (req, res) => {
                             return;
                         }
                         stats.patientsByStatus = rows;
-                        console.log('DEBUG patientsByStatus:', stats.patientsByStatus);
                         // Get appointment statistics
                         db.get('SELECT COUNT(*) as total FROM appointments', (err, row) => {
                             if (err) {
@@ -450,7 +445,6 @@ app.get('/api/statistics', requireAuth, requireRole(['admin']), (req, res) => {
                                 return;
                             }
                             stats.totalAppointments = row.total;
-                            console.log('DEBUG totalAppointments:', stats.totalAppointments);
                             res.json(stats);
                         });
                     });
