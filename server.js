@@ -320,21 +320,28 @@ app.put('/api/patients/:id', requireAuth, (req, res) => {
 app.get('/api/appointments', requireAuth, (req, res) => {
     const date = req.query.date;
     const dieticianId = req.query.dieticianId;
-    
-    let query = 'SELECT a.*, p.first_name, p.last_name FROM appointments a JOIN patients p ON a.patient_id = p.id';
+
+    // New query: LEFT JOIN patients and users, so we always get all appointments
+    let query = `SELECT a.*, 
+        COALESCE(p.first_name, '') as first_name, 
+        COALESCE(p.last_name, '') as last_name, 
+        COALESCE(u.username, '') as dietician_name
+        FROM appointments a
+        LEFT JOIN patients p ON a.patient_id = p.id
+        LEFT JOIN users u ON a.dietician_id = u.id`;
     const params = [];
-    
+    let where = [];
     if (date) {
-        query += ' WHERE a.date = ?';
+        where.push('a.date = ?');
         params.push(date);
     }
-    
     if (dieticianId) {
-        query += date ? ' AND' : ' WHERE';
-        query += ' a.dietician_id = ?';
+        where.push('a.dietician_id = ?');
         params.push(dieticianId);
     }
-    
+    if (where.length) {
+        query += ' WHERE ' + where.join(' AND ');
+    }
     db.all(query, params, (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });

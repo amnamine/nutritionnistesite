@@ -433,32 +433,45 @@
                     <!-- Progress Bar -->
                     <div class="booking-progress">
                         <div class="progress-step active" id="progress-step1">
+                            <div class="step-icon"><i class="fas fa-user-md"></i></div>
+                            <span class="step-label">Diététicien</span>
+                        </div>
+                        <div class="progress-line"></div>
+                        <div class="progress-step" id="progress-step2">
                             <div class="step-icon"><i class="fas fa-calendar"></i></div>
                             <span class="step-label">Date</span>
                         </div>
                         <div class="progress-line"></div>
-                        <div class="progress-step" id="progress-step2">
+                        <div class="progress-step" id="progress-step3">
                             <div class="step-icon"><i class="fas fa-clock"></i></div>
                             <span class="step-label">Horaire</span>
                         </div>
                         <div class="progress-line"></div>
-                        <div class="progress-step" id="progress-step3">
+                        <div class="progress-step" id="progress-step4">
                             <div class="step-icon"><i class="fas fa-user"></i></div>
                             <span class="step-label">Patient</span>
                         </div>
                         <div class="progress-line"></div>
-                        <div class="progress-step" id="progress-step4">
+                        <div class="progress-step" id="progress-step5">
                             <div class="step-icon"><i class="fas fa-check-circle"></i></div>
                             <span class="step-label">Validation</span>
                         </div>
                     </div>
 
-                    <!-- Étape 1: Sélection de la date -->
+                    <!-- Étape 1: Sélection du diététicien et de la date -->
                     <div id="step1" class="booking-step active">
                         <div class="step-content">
-                            <h3><i class="fas fa-calendar"></i> Choisissez une date</h3>
+                            <h3><i class="fas fa-user-md"></i> Choisissez un diététicien</h3>
+                            <p class="step-description">Sélectionnez le diététicien pour ce rendez-vous.</p>
+                            <div class="form-group">
+                                <label for="dietician-select" style="font-weight:500; margin-bottom:0.5rem;">Diététicien :</label>
+                                <select id="dietician-select" class="form-control" style="font-size:1.2rem; padding:0.5rem 1rem; border-radius:8px; border:1px solid #bfc4d1; margin-bottom:1.5rem;">
+                                    <option value="">-- Sélectionner un diététicien --</option>
+                                    <!-- Les options seront remplies dynamiquement -->
+                                </select>
+                            </div>
+                            <h3 style="margin-top:2rem;"><i class="fas fa-calendar"></i> Choisissez une date</h3>
                             <p class="step-description">Sélectionnez la date souhaitée pour votre rendez-vous.</p>
-                            
                             <div class="calendar-container">
                                 <div class="calendar-header">
                                     <div class="selected-date">
@@ -474,7 +487,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="step-actions">
                                 <button onclick="selectDate()" class="btn-next" id="continue-date-btn" disabled>
                                     <i class="fas fa-arrow-right"></i> Continuer
@@ -568,34 +580,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
-
-            <!-- Section Liste des Rendez-vous -->
-            <section id="appointment-list" class="section">
-                <h2><i class="fas fa-calendar-alt"></i> Liste des Rendez-vous</h2>
-                
-                <!-- Recherche de rendez-vous -->
-                <div class="search-section">
-                    <div class="search-box">
-                        <i class="fas fa-calendar-day"></i>
-                        <input type="date" id="appointment-date">
-                    </div>
-                    <button onclick="searchAppointments()" class="search-btn">
-                        <i class="fas fa-search"></i> Rechercher les rendez-vous
-                    </button>
-                </div>
-                
-                <!-- Liste des rendez-vous -->
-                <div id="appointment-list-results" class="results-section"></div>
-
-                <!-- Rendez-vous du jour -->
-                <div class="today-appointments">
-                    <h3><i class="fas fa-calendar-day"></i> Rendez-vous du jour</h3>
-                    <button onclick="loadTodayAppointments()" class="submit-btn">
-                        <i class="fas fa-calendar-check"></i> Afficher les rendez-vous d'aujourd'hui
-                    </button>
-                    <div id="today-list" class="today-appointments-list"></div>
                 </div>
             </section>
         </main>

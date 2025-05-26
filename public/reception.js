@@ -59,16 +59,47 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // Charger dynamiquement la liste des diététiciens
+    if (dieticianSelect) {
+        try {
+            const response = await fetch('/api/users?role=dieteticien');
+            const dieticians = await response.json();
+            dieticianSelect.innerHTML = '<option value="">-- Sélectionner un diététicien --</option>' +
+                dieticians.map(d => `<option value="${d.id}">${d.username}</option>`).join('');
+        } catch (error) {
+            dieticianSelect.innerHTML = '<option value="">Erreur chargement diététiciens</option>';
+        }
+    }
+
+    // Rendre la sélection du diététicien obligatoire avant de pouvoir choisir une date et continuer
+    const continueDateBtn = document.getElementById('continue-date-btn');
+    if (dieticianSelect && continueDateBtn) {
+        dieticianSelect.addEventListener('change', () => {
+            // Désactiver le calendrier tant qu'aucun diététicien n'est sélectionné
+            if (!dieticianSelect.value) {
+                continueDateBtn.disabled = true;
+                window.selectedAppointmentDate = null;
+                if (document.getElementById('display-selected-date')) {
+                    document.getElementById('display-selected-date').textContent = 'Aucune date sélectionnée';
+                }
+            }
+        });
+    }
+
     // Initialisation du calendrier FullCalendar v5+
     if (calendar) {
         const displaySelectedDate = document.getElementById('display-selected-date');
-        const continueDateBtn = document.getElementById('continue-date-btn');
         window.selectedAppointmentDate = null;
         const calendarObj = new FullCalendar.Calendar(calendar, {
             locale: 'fr',
             initialView: 'dayGridMonth',
             selectable: true,
             select: function(info) {
+                // On ne permet la sélection de date que si un diététicien est choisi
+                if (!dieticianSelect || !dieticianSelect.value) {
+                    showNotification('Veuillez d\'abord sélectionner un diététicien', 'error');
+                    return;
+                }
                 const dateStr = info.startStr;
                 window.selectedAppointmentDate = dateStr;
                 if (displaySelectedDate) displaySelectedDate.textContent = moment(dateStr).format('dddd D MMMM YYYY');
@@ -86,6 +117,34 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.selectedAppointmentTime = timeSlotSelect.value;
             continueTimeBtn.disabled = !window.selectedAppointmentTime;
         });
+    }
+
+    // Correction : supprimer les onclick HTML sur les boutons de l'étape 4 pour éviter tout conflit
+    const confirmBtn = document.querySelector('#step4 .btn-validate');
+    const backBtn = document.querySelector('#step4 .btn-back');
+    if (confirmBtn) confirmBtn.removeAttribute('onclick');
+    if (backBtn) backBtn.removeAttribute('onclick');
+
+    if (confirmBtn) {
+        confirmBtn.onclick = async (e) => {
+            e.preventDefault();
+            await confirmAppointment();
+        };
+    }
+    if (backBtn) {
+        backBtn.onclick = (e) => {
+            e.preventDefault();
+            document.getElementById('step4').classList.remove('active');
+            document.getElementById('step3').classList.add('active');
+            document.getElementById('progress-step4').classList.remove('active');
+            document.getElementById('progress-step3').classList.remove('completed');
+        };
+    }
+
+    // Ajouter la logique pour le bouton 'Afficher tous les rendez-vous'
+    const showAllAppointmentsBtn = document.getElementById('show-all-appointments');
+    if (showAllAppointmentsBtn) {
+        showAllAppointmentsBtn.addEventListener('click', showAllAppointmentsTable);
     }
 });
 
@@ -224,36 +283,39 @@ function openEditModal(patientId) {
 }
 
 // Edit patient form submission
-document.getElementById('edit-patient-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const patientId = document.getElementById('edit-patient-id').value;
-    const patientData = {
-        first_name: document.getElementById('edit-first-name').value,
-        last_name: document.getElementById('edit-last-name').value,
-        phone: document.getElementById('edit-phone').value,
-        email: document.getElementById('edit-email').value,
-        address: document.getElementById('edit-address').value
-    };
+const editPatientForm = document.getElementById('edit-patient-form');
+if (editPatientForm) {
+    editPatientForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const patientId = document.getElementById('edit-patient-id').value;
+        const patientData = {
+            first_name: document.getElementById('edit-first-name').value,
+            last_name: document.getElementById('edit-last-name').value,
+            phone: document.getElementById('edit-phone').value,
+            email: document.getElementById('edit-email').value,
+            address: document.getElementById('edit-address').value
+        };
 
-    try {
-        const response = await fetch(`/api/patients/${patientId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(patientData)
-        });
+        try {
+            const response = await fetch(`/api/patients/${patientId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(patientData)
+            });
 
-        if (response.ok) {
-            patientModal.style.display = 'none';
-            searchPatient();
-            showNotification('Patient modifié avec succès');
+            if (response.ok) {
+                patientModal.style.display = 'none';
+                searchPatient();
+                showNotification('Patient modifié avec succès');
+            }
+        } catch (error) {
+            console.error('Error updating patient:', error);
+            showNotification('Erreur lors de la modification du patient', 'error');
         }
-    } catch (error) {
-        console.error('Error updating patient:', error);
-        showNotification('Erreur lors de la modification du patient', 'error');
-    }
-});
+    });
+}
 
 // Fonction pour sélectionner un diététicien et passer à l'étape suivante
 function selectDietician() {
@@ -365,8 +427,14 @@ function showValidationForm(date, time, dieticianId) {
 
 // Function to handle patient info validation and move to next step
 function validatePatientInfo() {
-    const patientName = document.getElementById('patient-name').value;
-    const patientFirstname = document.getElementById('patient-firstname').value;
+    const patientNameInput = document.getElementById('patient-name');
+    const patientFirstnameInput = document.getElementById('patient-firstname');
+    const summaryDate = document.getElementById('summary-date');
+    const summaryTime = document.getElementById('summary-time');
+    const summaryPatient = document.getElementById('summary-patient');
+
+    const patientName = patientNameInput ? patientNameInput.value : '';
+    const patientFirstname = patientFirstnameInput ? patientFirstnameInput.value : '';
 
     if (!patientName || !patientFirstname) {
         showNotification('Veuillez remplir le nom et le prénom du patient', 'error');
@@ -378,33 +446,37 @@ function validatePatientInfo() {
     window.selectedPatientFirstname = patientFirstname;
 
     // Hide current step
-    document.getElementById('step3').classList.remove('active');
-    // Show next step
-    document.getElementById('step4').classList.add('active');
+    const step3 = document.getElementById('step3');
+    const step4 = document.getElementById('step4');
+    if (step3) step3.classList.remove('active');
+    if (step4) step4.classList.add('active');
     // Update progress bar
-    document.getElementById('progress-step3').classList.add('completed');
-    document.getElementById('progress-step4').classList.add('active');
+    const progressStep3 = document.getElementById('progress-step3');
+    const progressStep4 = document.getElementById('progress-step4');
+    if (progressStep3) progressStep3.classList.add('completed');
+    if (progressStep4) progressStep4.classList.add('active');
 
     // Update summary details
-    document.getElementById('summary-date').textContent = new Date(window.selectedAppointmentDate).toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    document.getElementById('summary-time').textContent = window.selectedAppointmentTime;
-    document.getElementById('summary-patient').textContent = `${window.selectedPatientFirstname} ${window.selectedPatientName}`;
+    if (summaryDate && window.selectedAppointmentDate) summaryDate.textContent = new Date(window.selectedAppointmentDate).toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    if (summaryTime && window.selectedAppointmentTime) summaryTime.textContent = window.selectedAppointmentTime;
+    if (summaryPatient) summaryPatient.textContent = `${window.selectedPatientFirstname} ${window.selectedPatientName}`;
 }
 
 // Function to confirm the appointment
 async function confirmAppointment() {
-    console.log('Attempting to confirm appointment...');
     const date = window.selectedAppointmentDate;
     const time = window.selectedAppointmentTime;
     const patientName = window.selectedPatientName;
     const patientFirstname = window.selectedPatientFirstname;
-    const dieticianId = dieticianSelect.value;
+    const dieticianSelect = document.getElementById('dietician-select');
+    const dieticianId = dieticianSelect ? dieticianSelect.value : '';
 
-    console.log('Appointment data:', { date, time, patientName, patientFirstname, dieticianId });
-
-    if (!date || !time || !patientName || !patientFirstname || !dieticianId) {
-        console.error('Missing appointment data:', { date, time, patientName, patientFirstname, dieticianId });
-        showNotification('Informations du rendez-vous incomplètes. Veuillez recommencer.', 'error');
+    if (!date) {
+        showNotification('Veuillez sélectionner une date', 'error');
+        return;
+    }
+    if (!time || !patientName || !patientFirstname) {
+        showNotification('Informations du rendez-vous incomplètes.', 'error');
         return;
     }
 
@@ -419,7 +491,7 @@ async function confirmAppointment() {
                 time: time,
                 first_name: patientFirstname,
                 last_name: patientName,
-                dietician_id: parseInt(dieticianId)
+                dietician_id: dieticianId ? parseInt(dieticianId) : null
             })
         });
 
@@ -427,16 +499,11 @@ async function confirmAppointment() {
 
         if (response.ok) {
             console.log('Appointment confirmed successfully.');
-            showNotification('Rendez-vous validé avec succès');
-            
-            // Réinitialiser le processus de réservation
+            showNotification('Rendez-vous pris !', 'success');
             cancelBooking();
-            
-            // Mettre à jour la liste des rendez-vous du jour
             await loadTodayAppointments();
-            
-            // Mettre à jour la liste des rendez-vous pour la date sélectionnée
-            document.getElementById('appointment-date').value = date;
+            const appointmentDateInput = document.getElementById('appointment-date');
+            if (appointmentDateInput) appointmentDateInput.value = date;
             await searchAppointments();
         } else {
             const error = await response.json();
@@ -454,26 +521,31 @@ function cancelBooking() {
     // Hide all steps
     document.querySelectorAll('.booking-step').forEach(step => step.classList.remove('active'));
     // Show step 1
-    document.getElementById('step1').classList.add('active');
+    const step1 = document.getElementById('step1');
+    if (step1) step1.classList.add('active');
     // Reset progress bar
     document.querySelectorAll('.progress-step').forEach(step => step.classList.remove('active', 'completed'));
-    document.getElementById('progress-step1').classList.add('active');
-    
+    const progressStep1 = document.getElementById('progress-step1');
+    if (progressStep1) progressStep1.classList.add('active');
+
     // Clear stored data
     window.selectedAppointmentDate = null;
     window.selectedAppointmentTime = null;
     window.selectedPatientName = null;
     window.selectedPatientFirstname = null;
     // Reset dietician select (optional, depending on flow)
-    dieticianSelect.value = '';
-    
+    if (typeof dieticianSelect !== 'undefined' && dieticianSelect && 'value' in dieticianSelect) dieticianSelect.value = '';
+
     // Reset displayed selected date/time/patient
-    document.getElementById('display-selected-date').textContent = 'Aucune date sélectionnée';
-    document.getElementById('continue-date-btn').disabled = true;
-    
+    const displaySelectedDate = document.getElementById('display-selected-date');
+    if (displaySelectedDate) displaySelectedDate.textContent = 'Aucune date sélectionnée';
+    const continueDateBtn = document.getElementById('continue-date-btn');
+    if (continueDateBtn) continueDateBtn.disabled = true;
+
     // Clear time slots display
-    document.getElementById('time-slots').innerHTML = '';
-    
+    const timeSlotsDiv = document.getElementById('time-slots');
+    if (timeSlotsDiv) timeSlotsDiv.innerHTML = '';
+
     // Clear patient info fields
     const patientNameInput = document.getElementById('patient-name');
     if (patientNameInput) patientNameInput.value = '';
@@ -481,8 +553,8 @@ function cancelBooking() {
     if (patientFirstnameInput) patientFirstnameInput.value = '';
 
     // Remove confirmation summary if it exists
-     const existingSummary = document.querySelector('.appointment-summary');
-     if (existingSummary) existingSummary.remove();
+    const existingSummary = document.querySelector('.appointment-summary');
+    if (existingSummary) existingSummary.remove();
 }
 
 async function searchAppointments() {
@@ -547,14 +619,8 @@ async function cancelAppointment(appointmentId) {
 
 async function loadTodayAppointments() {
     const today = new Date().toISOString().split('T')[0];
-    const dieticianId = dieticianSelect.value;
-    if (!dieticianId) {
-        showNotification('Veuillez sélectionner un diététicien', 'error');
-        return;
-    }
-
     try {
-        const response = await fetch(`/api/appointments?date=${today}&dieticianId=${dieticianId}`);
+        const response = await fetch(`/api/appointments?date=${today}`);
         const appointments = await response.json();
         displayTodayAppointments(appointments);
     } catch (error) {
@@ -622,4 +688,46 @@ function selectDate() {
     document.getElementById('progress-step2').classList.add('active');
     // Stocker la date sélectionnée pour la suite
     // ... (autres actions si besoin)
+}
+
+async function showAllAppointmentsTable() {
+    try {
+        const response = await fetch('/api/appointments');
+        console.log('API response:', response);
+        const appointments = await response.json();
+        console.log('Appointments:', appointments);
+        const container = document.getElementById('appointments-table-container');
+        if (!container) return;
+        if (!appointments.length) {
+            container.innerHTML = '<p>Aucun rendez-vous trouvé.</p>';
+            return;
+        }
+        // Construction du tableau
+        let html = '<table id="all-appointments-table" style="width:100%;border-collapse:collapse;text-align:center;">';
+        html += '<thead><tr>' +
+            '<th>ID</th>' +
+            '<th>Date</th>' +
+            '<th>Heure</th>' +
+            '<th>Prénom</th>' +
+            '<th>Nom</th>' +
+            '<th>Diététicien</th>' +
+            '<th>Statut</th>' +
+            '</tr></thead><tbody>';
+        appointments.forEach(apt => {
+            html += `<tr>
+                <td>${apt.id || ''}</td>
+                <td>${apt.date || ''}</td>
+                <td>${apt.time || ''}</td>
+                <td>${apt.first_name || ''}</td>
+                <td>${apt.last_name || ''}</td>
+                <td>${apt.dietician_id || ''}</td>
+                <td>${apt.status || ''}</td>
+            </tr>`;
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    } catch (error) {
+        console.error('Error in showAllAppointmentsTable:', error);
+        showNotification('Erreur lors de l\'affichage de tous les rendez-vous', 'error');
+    }
 } 
