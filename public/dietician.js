@@ -51,15 +51,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const showPatientListBtn = document.getElementById('show-patient-list');
     const hidePatientListBtn = document.getElementById('hide-patient-list');
+    const showArchivedBtn = document.getElementById('show-archived-patients');
     const searchResultsDiv = document.getElementById('search-results');
     if (showPatientListBtn && hidePatientListBtn && searchResultsDiv) {
         showPatientListBtn.addEventListener('click', () => {
-            searchPatient(''); // Affiche tous les patients
-            searchResultsDiv.style.display = 'block';
+            // Affiche uniquement les patients non archivés (status !== 'archived')
+            fetch('/api/patients?includeArchived=true')
+                .then(res => res.json())
+                .then(patients => {
+                    const actifs = patients.filter(p => p.status !== 'archived');
+                    displayPatients(actifs);
+                    searchResultsDiv.style.display = 'block';
+                });
         });
         hidePatientListBtn.addEventListener('click', () => {
             searchResultsDiv.style.display = 'none';
             searchResultsDiv.innerHTML = '';
+        });
+    }
+    if (showArchivedBtn && searchResultsDiv) {
+        showArchivedBtn.addEventListener('click', () => {
+            fetch('/api/patients?includeArchived=true')
+                .then(res => res.json())
+                .then(patients => {
+                    const archived = patients.filter(p => p.status === 'archived');
+                    displayPatients(archived);
+                    searchResultsDiv.style.display = 'block';
+                });
         });
     }
 
@@ -130,7 +148,8 @@ function showMainInterface(user) {
         initializeCalendar();
     }
     loadTodayAppointments();
-    loadStatistics();
+    // Désactive temporairement les stats pour éviter l'erreur 403
+    // try { loadStatistics(); } catch(e) {}
 }
 
 // Initialize Calendar
@@ -169,6 +188,31 @@ async function searchPatient(searchTerm = null) {
     }
 }
 
+// Notification simple
+function showNotification(message, type = 'success') {
+    let notif = document.getElementById('notif-message');
+    if (!notif) {
+        notif = document.createElement('div');
+        notif.id = 'notif-message';
+        notif.style.position = 'fixed';
+        notif.style.top = '20px';
+        notif.style.left = '50%';
+        notif.style.transform = 'translateX(-50%)';
+        notif.style.zIndex = '9999';
+        notif.style.padding = '1rem 2rem';
+        notif.style.borderRadius = '8px';
+        notif.style.fontWeight = 'bold';
+        notif.style.fontSize = '1.1rem';
+        notif.style.boxShadow = '0 2px 8px #0002';
+        document.body.appendChild(notif);
+    }
+    notif.textContent = message;
+    notif.style.background = type === 'success' ? '#4caf50' : '#e74c3c';
+    notif.style.color = 'white';
+    notif.style.display = 'block';
+    setTimeout(() => { notif.style.display = 'none'; }, 2500);
+}
+
 function displayPatients(patients) {
     const resultsDiv = document.getElementById('search-results');
     resultsDiv.classList.add('patient-list-vertical');
@@ -183,15 +227,78 @@ function displayPatients(patients) {
             <p><i class="fas fa-envelope"></i> ${patient.email || 'Non renseigné'}</p>
             <p><i class="fas fa-map-marker-alt"></i> ${patient.address || 'Non renseignée'}</p>
             <div class="action-buttons">
-                <button class="edit-btn" onclick="openEditModal(${patient.id})">
+                <button class="edit-btn" data-id="${patient.id}">
                     <i class="fas fa-edit"></i> Modifier
                 </button>
-                <button class="archive-btn" onclick="archivePatient(${patient.id})">
+                <button class="archive-btn" data-id="${patient.id}">
                     <i class="fas fa-archive"></i> Archiver
                 </button>
             </div>
         </div>
     `).join('');
+    // Ajout des listeners après rendu
+    resultsDiv.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = btn.getAttribute('data-id');
+            console.log('Modifier patient id:', id);
+            if (typeof openEditModal === 'function') {
+                openEditModal(id);
+            } else {
+                alert('La fonction de modification n\'est pas encore disponible.');
+            }
+        });
+    });
+    resultsDiv.querySelectorAll('.archive-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = btn.getAttribute('data-id');
+            console.log('Archiver patient id:', id);
+            archivePatient(id);
+        });
+    });
+}
+
+async function archivePatient(id) {
+    try {
+        console.log('Envoi requête archivage pour patient', id);
+        // 1. Récupérer le patient
+        const getRes = await fetch(`/api/patients?includeArchived=true`);
+        const allPatients = await getRes.json();
+        const patient = allPatients.find(p => p.id == id);
+        if (!patient) {
+            showNotification('Patient introuvable', 'error');
+            return;
+        }
+        // 2. Envoyer tous les champs avec status: 'archived'
+        const payload = {
+            first_name: patient.first_name,
+            last_name: patient.last_name,
+            phone: patient.phone,
+            email: patient.email,
+            address: patient.address,
+            status: 'archived'
+        };
+        console.log('Payload archivage:', payload);
+        const response = await fetch(`/api/patients/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (response.ok) {
+            showNotification('Patient archivé avec succès', 'success');
+            // Recharge la liste des patients actifs
+            fetch('/api/patients?includeArchived=true')
+                .then(res => res.json())
+                .then(patients => {
+                    const actifs = patients.filter(p => p.status !== 'archived');
+                    displayPatients(actifs);
+                });
+        } else {
+            showNotification('Erreur lors de l\'archivage', 'error');
+        }
+    } catch (error) {
+        showNotification('Erreur lors de l\'archivage', 'error');
+        console.error('Erreur archivage patient:', error);
+    }
 }
 
 // Appointment Management
