@@ -58,6 +58,25 @@ document.addEventListener('DOMContentLoaded', async () => {
             searchResultsDiv.innerHTML = '';
         });
     }
+
+    // Initialisation du calendrier FullCalendar v5+
+    if (calendar) {
+        const displaySelectedDate = document.getElementById('display-selected-date');
+        const continueDateBtn = document.getElementById('continue-date-btn');
+        window.selectedAppointmentDate = null;
+        const calendarObj = new FullCalendar.Calendar(calendar, {
+            locale: 'fr',
+            initialView: 'dayGridMonth',
+            selectable: true,
+            select: function(info) {
+                const dateStr = info.startStr;
+                window.selectedAppointmentDate = dateStr;
+                if (displaySelectedDate) displaySelectedDate.textContent = moment(dateStr).format('dddd D MMMM YYYY');
+                if (continueDateBtn) continueDateBtn.disabled = false;
+            }
+        });
+        calendarObj.render();
+    }
 });
 
 // Logout
@@ -565,4 +584,18 @@ function showNotification(message, type = 'success') {
     setTimeout(() => {
         notification.remove();
     }, 3000);
+}
+
+// Fonction pour passer à l'étape suivante après sélection de la date
+function selectDate() {
+    if (!window.selectedAppointmentDate) {
+        showNotification('Veuillez sélectionner une date', 'error');
+        return;
+    }
+    document.getElementById('step1').classList.remove('active');
+    document.getElementById('step2').classList.add('active');
+    document.getElementById('progress-step1').classList.add('completed');
+    document.getElementById('progress-step2').classList.add('active');
+    // Stocker la date sélectionnée pour la suite
+    // ... (autres actions si besoin)
 } 
