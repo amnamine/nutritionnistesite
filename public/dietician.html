@@ -28,6 +28,15 @@
             <!-- Gestion des Patients -->
             <section id="patient-management" class="section">
                 <h2><i class="fas fa-users"></i> Gestion des Patients</h2>
+                <!-- Boutons pour afficher/cacher la liste des patients -->
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem; justify-content: flex-end;">
+                    <button id="show-patient-list" class="submit-btn">
+                        <i class="fas fa-users"></i> Voir tous les patients
+                    </button>
+                    <button id="hide-patient-list" class="submit-btn">
+                        <i class="fas fa-users-slash"></i> Cacher tous les patients
+                    </button>
+                </div>
                 
                 <div class="search-section">
                     <div class="search-box">
@@ -65,26 +74,6 @@
                         <button type="submit" class="submit-btn">Enregistrer</button>
                     </form>
                 </div>
-            </section>
-
-            <!-- Gestion des Rendez-vous -->
-            <section id="appointment-management" class="section">
-                <h2><i class="fas fa-calendar-alt"></i> Gestion des Rendez-vous</h2>
-                
-                <div class="calendar-section">
-                    <div id="calendar"></div>
-                    <div id="time-slots" class="time-slots"></div>
-                </div>
-                
-                <div class="search-section">
-                    <div class="search-box">
-                        <i class="fas fa-calendar-day"></i>
-                        <input type="date" id="appointment-date">
-                    </div>
-                    <button onclick="searchAppointments()" class="search-btn">Rechercher</button>
-                </div>
-                
-                <div id="appointment-list" class="results-section"></div>
             </section>
 
             <!-- Gestion des Consultations -->

@@ -3,7 +3,6 @@ const loginPage = document.getElementById('login-page');
 const mainInterface = document.getElementById('main-interface');
 const userRole = document.getElementById('user-role');
 const calendar = document.getElementById('calendar');
-const timeSlots = document.getElementById('time-slots');
 const consultationForm = document.getElementById('consultation-form');
 
 // Check authentication status on page load
@@ -49,6 +48,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         alert('logoutBtn introuvable !');
         console.log('logoutBtn introuvable !');
     }
+
+    const showPatientListBtn = document.getElementById('show-patient-list');
+    const hidePatientListBtn = document.getElementById('hide-patient-list');
+    const searchResultsDiv = document.getElementById('search-results');
+    if (showPatientListBtn && hidePatientListBtn && searchResultsDiv) {
+        showPatientListBtn.addEventListener('click', () => {
+            searchPatient(''); // Affiche tous les patients
+            searchResultsDiv.style.display = 'block';
+        });
+        hidePatientListBtn.addEventListener('click', () => {
+            searchResultsDiv.style.display = 'none';
+            searchResultsDiv.innerHTML = '';
+        });
+    }
 });
 
 function showMainInterface(user) {
@@ -83,8 +96,11 @@ function initializeCalendar() {
 }
 
 // Patient Management
-async function searchPatient() {
-    const searchTerm = document.getElementById('patient-search').value;
+async function searchPatient(searchTerm = null) {
+    if (searchTerm === null) {
+        const input = document.getElementById('patient-search');
+        searchTerm = input ? input.value : '';
+    }
     try {
         const response = await fetch(`/api/patients?search=${searchTerm}`);
         const patients = await response.json();

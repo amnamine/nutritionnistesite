@@ -766,7 +766,7 @@ body {
 /* Calendar */
 .calendar-section {
     display: grid;
-    grid-template-columns: 2fr 1fr; /* Calendar takes more space */
+    grid-template-columns: 1fr; /* Only one column, calendar takes full width */
     gap: var(--spacing-xl);
     margin-top: var(--spacing-lg);
 }
