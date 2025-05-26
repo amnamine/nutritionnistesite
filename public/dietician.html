@@ -49,8 +49,10 @@
                 <div id="search-results" class="results-section patient-list-vertical"></div>
                 
                 <div class="form-section">
-                    <h3><i class="fas fa-user-plus"></i> Ajouter un Nouveau Patient</h3>
-                    <form id="patient-form">
+                    <button id="toggle-add-patient-form" class="submit-btn" style="margin-bottom:1rem;">
+                        <i class="fas fa-user-plus"></i> Ajouter un patient
+                    </button>
+                    <form id="patient-form" style="display:none;">
                         <div class="form-group">
                             <label>Prénom</label>
                             <input type="text" id="first-name" required>

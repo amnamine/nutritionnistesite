@@ -108,6 +108,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Appel au chargement
     renderFoodCatalog();
+
+    const toggleAddPatientBtn = document.getElementById('toggle-add-patient-form');
+    const patientForm = document.getElementById('patient-form');
+    if (toggleAddPatientBtn && patientForm) {
+        toggleAddPatientBtn.addEventListener('click', () => {
+            if (patientForm.style.display === 'none' || patientForm.style.display === '') {
+                patientForm.style.display = 'block';
+            } else {
+                patientForm.style.display = 'none';
+            }
+        });
+    }
 });
 
 function showMainInterface(user) {
