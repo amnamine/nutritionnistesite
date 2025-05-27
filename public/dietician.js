@@ -233,24 +233,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     let consultsLoaded = false;
     if (toggleAllConsultsBtn && allConsultsSection && allConsultsList) {
         toggleAllConsultsBtn.addEventListener('click', async () => {
-            console.log('Bouton toggle consultations cliqué');
             if (allConsultsSection.style.display === 'none' || allConsultsSection.style.display === '') {
                 allConsultsSection.style.display = 'block';
                 try {
-                    console.log('Début du chargement des consultations...');
                     allConsultsList.innerHTML = '<div style="color:#888;">Chargement...</div>';
-                    
-                    // Vérifier d'abord l'authentification
-                    const authCheck = await fetch('/api/me', {
-                        credentials: 'include'
-                    });
-                    
-                    if (!authCheck.ok) {
-                        throw new Error('Non authentifié');
-                    }
-                    
-                    const user = await authCheck.json();
-                    console.log('Utilisateur connecté:', user);
                     
                     const res = await fetch('/api/consultations', { 
                         method: 'GET',
@@ -261,15 +247,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                         }
                     });
                     
-                    console.log('Réponse reçue:', res.status, res.statusText);
-                    
                     if (!res.ok) {
                         const errorData = await res.json().catch(() => ({}));
                         throw new Error(`Erreur HTTP: ${res.status} ${res.statusText} - ${errorData.error || ''}`);
                     }
                     
                     const consults = await res.json();
-                    console.log('Consultations reçues:', consults);
                     
                     if (Array.isArray(consults) && consults.length > 0) {
                         allConsultsList.innerHTML = consults.map(c => `
@@ -293,7 +276,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         allConsultsList.innerHTML = '<div style="text-align: center; color: #666; padding: 2rem;">Aucune consultation à afficher.</div>';
                     }
                 } catch (e) {
-                    console.error('Erreur détaillée:', e);
                     allConsultsList.innerHTML = `
                         <div style="color: #e74c3c; text-align: center; padding: 2rem; background: #fdf3f2; border-radius: 8px; margin: 1rem 0;">
                             <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>

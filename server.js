@@ -148,9 +148,8 @@ const requireRole = (roles) => {
     };
 };
 
-// Consultation routes - Déplacées avant les autres routes
+// Consultation routes
 app.get('/api/consultations', requireAuth, requireRole(['dieteticien']), (req, res) => {
-    console.log('GET /api/consultations - User:', req.session.user);
     const dietician_id = req.session.user.id;
     
     const query = `
@@ -166,21 +165,16 @@ app.get('/api/consultations', requireAuth, requireRole(['dieteticien']), (req, r
         ORDER BY c.date DESC
     `;
     
-    console.log('Executing query:', query, 'with dietician_id:', dietician_id);
-    
     db.all(query, [dietician_id], (err, rows) => {
         if (err) {
-            console.error('Database error:', err);
             res.status(500).json({ error: err.message });
             return;
         }
-        console.log('Query results:', rows);
         res.json(rows);
     });
 });
 
 app.post('/api/consultations', requireAuth, requireRole(['dieteticien']), (req, res) => {
-    console.log('POST /api/consultations - Body:', req.body);
     const { patient_id, weight, height, imc, pa_plus, pb_plus, tour_taille, compte_rendu } = req.body;
     const dietician_id = req.session.user.id;
     
@@ -196,7 +190,6 @@ app.post('/api/consultations', requireAuth, requireRole(['dieteticien']), (req, 
         pa_plus, pb_plus, tour_taille, compte_rendu
     ], function(err) {
         if (err) {
-            console.error('Database error:', err);
             res.status(500).json({ error: err.message });
             return;
         }
