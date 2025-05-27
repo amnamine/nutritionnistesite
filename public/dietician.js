@@ -226,13 +226,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Affichage/masquage de la section des consultations
+    // Affichage/masquage de la section des consultations + chargement dynamique
     const toggleAllConsultsBtn = document.getElementById('toggle-all-consults');
     const allConsultsSection = document.getElementById('all-consults-section');
-    if (toggleAllConsultsBtn && allConsultsSection) {
-        toggleAllConsultsBtn.addEventListener('click', () => {
+    const allConsultsList = document.getElementById('all-consults-list');
+    let consultsLoaded = false;
+    if (toggleAllConsultsBtn && allConsultsSection && allConsultsList) {
+        toggleAllConsultsBtn.addEventListener('click', async () => {
             if (allConsultsSection.style.display === 'none' || allConsultsSection.style.display === '') {
                 allConsultsSection.style.display = 'block';
+                // Charger les consultations si pas déjà fait ou à chaque affichage (selon besoin)
+                try {
+                    allConsultsList.innerHTML = '<div style="color:#888;">Chargement...</div>';
+                    const res = await fetch('/api/consultations', { credentials: 'include' });
+                    const consults = await res.json();
+                    if (Array.isArray(consults) && consults.length > 0) {
+                        allConsultsList.innerHTML = consults.map(c => `
+                            <div class="consultation-history-item">
+                                <div class="consultation-date"><i class="fas fa-calendar-alt"></i> ${c.date ? c.date.split('T')[0] : ''}</div>
+                                <div class="consultation-data">
+                                    <p><strong>Patient :</strong> ${c.first_name || ''} ${c.last_name || ''}</p>
+                                    <p><strong>Poids :</strong> ${c.weight || ''} kg</p>
+                                    <p><strong>Taille :</strong> ${c.height || ''} cm</p>
+                                    <p><strong>IMC :</strong> ${c.imc || ''}</p>
+                                    <p><strong>PA+ :</strong> ${c.pa_plus || ''}</p>
+                                    <p><strong>PB+ :</strong> ${c.pb_plus || ''}</p>
+                                    <p><strong>Tour de taille :</strong> ${c.tour_taille || ''}</p>
+                                    <p><strong>Compte rendu :</strong> ${c.compte_rendu || ''}</p>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        allConsultsList.innerHTML = 'Aucune consultation à afficher.';
+                    }
+                } catch (e) {
+                    allConsultsList.innerHTML = '<span style="color:red;">Erreur lors du chargement des consultations.</span>';
+                }
             } else {
                 allConsultsSection.style.display = 'none';
             }
