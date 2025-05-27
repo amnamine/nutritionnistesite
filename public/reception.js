@@ -163,12 +163,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Délégation d'événement pour les boutons Modifier/Annuler dans la liste des rendez-vous
     if (appointmentsList) {
         appointmentsList.addEventListener('click', function(e) {
-            const editBtn = e.target.closest('.edit-btn');
             const cancelBtn = e.target.closest('.cancel-btn');
-            if (editBtn) {
-                const id = editBtn.getAttribute('data-id');
-                if (id) editAppointment(Number(id));
-            } else if (cancelBtn) {
+            if (cancelBtn) {
                 const id = cancelBtn.getAttribute('data-id');
                 if (id) cancelAppointment(Number(id));
             }
@@ -629,9 +625,6 @@ async function loadAllAppointments() {
                     </p>
                 </div>
                 <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                    <button class="edit-btn" data-id="${apt.id}" style="flex: 1; padding: 0.5rem; border: none; border-radius: 6px; background: #e8f0fe; color: #5a8dee; cursor: pointer;">
-                        <i class="fas fa-edit"></i> Modifier
-                    </button>
                     <button class="cancel-btn" data-id="${apt.id}" style="flex: 1; padding: 0.5rem; border: none; border-radius: 6px; background: #fee8e8; color: #e74c3c; cursor: pointer;">
                         <i class="fas fa-times"></i> Annuler
                     </button>
