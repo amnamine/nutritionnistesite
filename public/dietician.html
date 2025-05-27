@@ -92,12 +92,10 @@
                     <h3>Nouvelle Consultation</h3>
                     <form id="consultation-data-form" style="display:flex; flex-direction:column; gap:1rem;">
                         <div class="form-group">
-                            <label>Nom</label>
-                            <input type="text" id="consult-nom" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Prénom</label>
-                            <input type="text" id="consult-prenom" required>
+                            <label>Patient</label>
+                            <select id="consult-patient" required>
+                                <option value="">Sélectionner un patient...</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label>Poids (kg)</label>
@@ -145,19 +143,19 @@
                     </div>
                 </div>
 
-                <div id="food-catalog" class="catalog-section">
-                    <h3>Catalogue Alimentaire</h3>
-                    <div id="food-catalog-grid" class="catalog-grid">
-                        <!-- Les aliments seront ajoutés dynamiquement ici -->
-                    </div>
-                </div>
-
                 <button id="toggle-all-consults" class="submit-btn" style="margin:1.5rem 0 1rem 0;">
                     <i class="fas fa-list"></i> Voir/Cacher toutes les consultations
                 </button>
                 <div id="all-consults-section" style="display:none; padding:1rem; background:#f8f9fa; border-radius:10px; box-shadow:0 2px 8px #0001; margin-bottom:2rem;">
                     <h4 style="color:#5a8dee;">Liste des consultations</h4>
                     <div id="all-consults-list" style="color:#333; font-size:1.05rem;">Aucune consultation à afficher.</div>
+                </div>
+
+                <div id="food-catalog" class="catalog-section">
+                    <h3>Catalogue Alimentaire</h3>
+                    <div id="food-catalog-grid" class="catalog-grid">
+                        <!-- Les aliments seront ajoutés dynamiquement ici -->
+                    </div>
                 </div>
             </section>
         </div>

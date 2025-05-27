@@ -140,6 +140,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     loadPatientCounters();
 
+    // Charger la liste des patients dans le select du formulaire de consultation
+    async function populatePatientSelect() {
+        const select = document.getElementById('consult-patient');
+        if (!select) return;
+        try {
+            const res = await fetch('/api/patients?includeArchived=false');
+            const patients = await res.json();
+            select.innerHTML = '<option value="">Sélectionner un patient...</option>' +
+                patients.map(p => `<option value="${p.id}">${p.first_name} ${p.last_name}</option>`).join('');
+        } catch (e) {
+            select.innerHTML = '<option value="">Erreur chargement patients</option>';
+        }
+    }
+    populatePatientSelect();
+
     // Formulaire de consultation : calcul automatique de l'IMC
     const poidsInput = document.getElementById('consult-poids');
     const tailleInput = document.getElementById('consult-taille');
@@ -164,23 +179,40 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Gestion de la soumission du formulaire de consultation
     const consultForm = document.getElementById('consultation-data-form');
     if (consultForm) {
-        consultForm.addEventListener('submit', function(e) {
+        consultForm.addEventListener('submit', async function(e) {
             e.preventDefault();
+            const patientId = document.getElementById('consult-patient').value;
+            if (!patientId) {
+                showNotification('Veuillez sélectionner un patient', 'error');
+                return;
+            }
             const data = {
-                nom: document.getElementById('consult-nom').value,
-                prenom: document.getElementById('consult-prenom').value,
+                patient_id: patientId,
                 poids: document.getElementById('consult-poids').value,
                 taille: document.getElementById('consult-taille').value,
-                tourTaille: document.getElementById('consult-tour-taille').value,
-                paPlus: document.getElementById('consult-pa-plus').value,
-                pbPlus: document.getElementById('consult-pb-plus').value,
+                tour_taille: document.getElementById('consult-tour-taille').value,
+                pa_plus: document.getElementById('consult-pa-plus').value,
+                pb_plus: document.getElementById('consult-pb-plus').value,
                 imc: document.getElementById('consult-imc').value
             };
-            // Pour l'instant, juste afficher dans la console
-            console.log('Consultation enregistrée :', data);
-            showNotification('Consultation enregistrée (simulation)', 'success');
-            consultForm.reset();
-            imcInput.value = '';
+            try {
+                const res = await fetch('/api/consultations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    showNotification('Consultation enregistrée avec succès', 'success');
+                    consultForm.reset();
+                    imcInput.value = '';
+                } else {
+                    const err = await res.json();
+                    showNotification('Erreur: ' + (err.error || 'enregistrement impossible'), 'error');
+                }
+            } catch (err) {
+                showNotification('Erreur réseau lors de l\'enregistrement', 'error');
+            }
         });
     }
 
