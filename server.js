@@ -267,6 +267,14 @@ app.put('/api/users/:id', requireAuth, requireRole(['admin']), async (req, res) 
     }
 });
 
+app.delete('/api/users/:id', requireAuth, requireRole(['admin']), (req, res) => {
+    const userId = req.params.id;
+    db.run('DELETE FROM users WHERE id = ?', [userId], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: 'Utilisateur supprimé' });
+    });
+});
+
 // Patient routes with archive functionality
 app.get('/api/patients', requireAuth, (req, res) => {
     const search = req.query.search || '';

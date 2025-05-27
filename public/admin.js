@@ -15,10 +15,54 @@ async function loadUsers() {
                 <td>${user.role}</td>
                 <td><span class="user-status status-${user.status === 'active' ? 'active' : 'inactive'}">${user.status || 'active'}</span></td>
                 <td class="user-actions">
-                    <!-- Actions à compléter plus tard -->
+                    <button class="action-btn delete-btn" data-id="${user.id}"><i class="fas fa-trash"></i> Supprimer</button>
+                    <button class="action-btn edit-btn" data-id="${user.id}" data-status="${user.status}">
+                        <i class="fas fa-toggle-${user.status === 'active' ? 'on' : 'off'}"></i> ${user.status === 'active' ? 'Désactiver' : 'Activer'}
+                    </button>
                 </td>
             `;
             userList.appendChild(tr);
+        });
+        // Ajout des listeners pour les boutons
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const userId = btn.getAttribute('data-id');
+                if (confirm('Confirmer la suppression de cet utilisateur ?')) {
+                    try {
+                        const response = await fetch(`/api/users/${userId}`, { method: 'DELETE' });
+                        if (response.ok) {
+                            loadUsers();
+                            if (window.showNotification) window.showNotification('Utilisateur supprimé', 'success');
+                        } else {
+                            if (window.showNotification) window.showNotification('Erreur lors de la suppression', 'error');
+                        }
+                    } catch (error) {
+                        if (window.showNotification) window.showNotification('Erreur lors de la suppression', 'error');
+                    }
+                }
+            });
+        });
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const userId = btn.getAttribute('data-id');
+                const currentStatus = btn.getAttribute('data-status');
+                const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+                try {
+                    const response = await fetch(`/api/users/${userId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: newStatus })
+                    });
+                    if (response.ok) {
+                        loadUsers();
+                        if (window.showNotification) window.showNotification('Statut modifié', 'success');
+                    } else {
+                        if (window.showNotification) window.showNotification('Erreur lors du changement de statut', 'error');
+                    }
+                } catch (error) {
+                    if (window.showNotification) window.showNotification('Erreur lors du changement de statut', 'error');
+                }
+            });
         });
     } catch (error) {
         console.error('Erreur chargement utilisateurs:', error);
