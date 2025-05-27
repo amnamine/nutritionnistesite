@@ -83,33 +83,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Catalogue alimentaire stylé avec images dynamiques
     const foodCatalog = [
-        { name: 'Pomme', calories: 52, description: 'Riche en fibres et en vitamine C. Idéale pour une collation saine.' },
-        { name: 'Banane', calories: 89, description: 'Source d\'énergie rapide, riche en potassium.' },
-        { name: 'Carotte', calories: 41, description: 'Bonne pour la vue, riche en bêta-carotène.' },
-        { name: 'Poulet grillé', calories: 165, description: 'Excellente source de protéines maigres.' },
-        { name: 'Riz complet', calories: 111, description: 'Riche en fibres, idéal pour l\'énergie durable.' },
-        { name: 'Brocoli', calories: 34, description: 'Très riche en vitamines et minéraux.' },
-        { name: 'Saumon', calories: 208, description: 'Riche en oméga-3, excellent pour le cœur.' },
-        { name: 'Amandes', calories: 579, description: 'Source de bons lipides et de protéines végétales.' },
-        { name: 'Tomate', calories: 18, description: 'Faible en calories, riche en antioxydants.' },
-        { name: 'Yaourt nature', calories: 61, description: 'Bonne source de calcium et de probiotiques.' }
+        { name: 'Pomme', calories: 52, description: 'Riche en fibres et en vitamine C. Idéale pour une collation saine.', image: 'pomme.jpg' },
+        { name: 'Banane', calories: 89, description: 'Source d\'énergie rapide, riche en potassium.', image: 'banane.jpg' },
+        { name: 'Carotte', calories: 41, description: 'Bonne pour la vue, riche en bêta-carotène.', image: 'carotte.jpg' },
+        { name: 'Poulet', calories: 165, description: 'Excellente source de protéines maigres.', image: 'poulet.jpg' },
+        { name: 'Riz', calories: 111, description: 'Riche en fibres, idéal pour l\'énergie durable.', image: 'riz.jpg' },
+        { name: 'Brocoli', calories: 34, description: 'Très riche en vitamines et minéraux.', image: 'brocoli.jpg' },
+        { name: 'Saumon', calories: 208, description: 'Riche en oméga-3, excellent pour le cœur.', image: 'saumon.jpg' },
+        { name: 'Amandes', calories: 579, description: 'Source de bons lipides et de protéines végétales.', image: 'amandes.jpg' },
+        { name: 'Tomate', calories: 18, description: 'Faible en calories, riche en antioxydants.', image: 'tomate.jpg' },
+        { name: 'Yaourt', calories: 61, description: 'Bonne source de calcium et de probiotiques.', image: 'yaourt.jpg' }
     ];
 
     async function renderFoodCatalog() {
         const foodCatalogGrid = document.getElementById('food-catalog-grid');
         if (!foodCatalogGrid) return;
         foodCatalogGrid.innerHTML = '<div style="text-align:center;color:#888;font-size:1.1rem;">Chargement du catalogue...</div>';
-        const cards = await Promise.all(foodCatalog.map(async food => {
-            const img = await fetchFoodImage(food.name);
+        const cards = foodCatalog.map(food => {
             return `
                 <div class="catalog-item food-card-anim" style="border:2.5px solid #5a8dee;border-radius:18px;padding:1.5rem;background:linear-gradient(135deg,#f8f9fa 60%,#eaf1ff 100%);box-shadow:0 4px 18px rgba(90,141,238,0.10);transition:box-shadow 0.25s,transform 0.18s;cursor:pointer;min-width:220px;max-width:260px;display:flex;flex-direction:column;align-items:center;gap:0.5rem;">
-                    <img src="${img}" alt="${food.name}" style="width:90px;height:90px;object-fit:cover;border-radius:14px;margin-bottom:0.7rem;border:2.5px solid #4cd185;background:#fff;box-shadow:0 2px 8px #4cd18522;transition:transform 0.2s;">
+                    <img src="/images/${food.image}" alt="${food.name}" style="width:90px;height:90px;object-fit:cover;border-radius:14px;margin-bottom:0.7rem;border:2.5px solid #4cd185;background:#fff;box-shadow:0 2px 8px #4cd18522;transition:transform 0.2s;">
                     <h4 style="color:#5a8dee;font-size:1.15rem;margin-bottom:0.3rem;font-weight:700;letter-spacing:0.5px;">${food.name}</h4>
                     <p style="color:#4cd185;font-weight:700;margin-bottom:0.2rem;font-size:1.05rem;">${food.calories} kcal / 100g</p>
                     <p style="color:#343a40;font-size:0.98rem;">${food.description}</p>
                 </div>
             `;
-        }));
+        });
         foodCatalogGrid.innerHTML = cards.join('');
         // Animation au survol
         document.querySelectorAll('.food-card-anim').forEach(card => {
