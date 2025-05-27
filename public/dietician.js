@@ -139,6 +139,76 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     loadPatientCounters();
+
+    // Formulaire de consultation : calcul automatique de l'IMC
+    const poidsInput = document.getElementById('consult-poids');
+    const tailleInput = document.getElementById('consult-taille');
+    const imcInput = document.getElementById('consult-imc');
+
+    function updateIMC() {
+        const poids = parseFloat(poidsInput.value);
+        const tailleCm = parseFloat(tailleInput.value);
+        if (!isNaN(poids) && !isNaN(tailleCm) && tailleCm > 0) {
+            const tailleM = tailleCm / 100;
+            const imc = poids / (tailleM * tailleM);
+            imcInput.value = imc.toFixed(2);
+        } else {
+            imcInput.value = '';
+        }
+    }
+    if (poidsInput && tailleInput && imcInput) {
+        poidsInput.addEventListener('input', updateIMC);
+        tailleInput.addEventListener('input', updateIMC);
+    }
+
+    // Gestion de la soumission du formulaire de consultation
+    const consultForm = document.getElementById('consultation-data-form');
+    if (consultForm) {
+        consultForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const data = {
+                nom: document.getElementById('consult-nom').value,
+                prenom: document.getElementById('consult-prenom').value,
+                poids: document.getElementById('consult-poids').value,
+                taille: document.getElementById('consult-taille').value,
+                tourTaille: document.getElementById('consult-tour-taille').value,
+                paPlus: document.getElementById('consult-pa-plus').value,
+                pbPlus: document.getElementById('consult-pb-plus').value,
+                imc: document.getElementById('consult-imc').value
+            };
+            // Pour l'instant, juste afficher dans la console
+            console.log('Consultation enregistrée :', data);
+            showNotification('Consultation enregistrée (simulation)', 'success');
+            consultForm.reset();
+            imcInput.value = '';
+        });
+    }
+
+    // Affichage/masquage du formulaire de consultation
+    const toggleConsultBtn = document.getElementById('toggle-consult-form');
+    const consultFormDiv = document.getElementById('consultation-form');
+    if (toggleConsultBtn && consultFormDiv) {
+        toggleConsultBtn.addEventListener('click', () => {
+            if (consultFormDiv.style.display === 'none' || consultFormDiv.style.display === '') {
+                consultFormDiv.style.display = 'block';
+            } else {
+                consultFormDiv.style.display = 'none';
+            }
+        });
+    }
+
+    // Affichage/masquage de la section des consultations
+    const toggleAllConsultsBtn = document.getElementById('toggle-all-consults');
+    const allConsultsSection = document.getElementById('all-consults-section');
+    if (toggleAllConsultsBtn && allConsultsSection) {
+        toggleAllConsultsBtn.addEventListener('click', () => {
+            if (allConsultsSection.style.display === 'none' || allConsultsSection.style.display === '') {
+                allConsultsSection.style.display = 'block';
+            } else {
+                allConsultsSection.style.display = 'none';
+            }
+        });
+    }
 });
 
 function showMainInterface(user) {

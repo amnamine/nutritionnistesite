@@ -85,30 +85,43 @@
             <section id="consultation-management" class="section">
                 <h2><i class="fas fa-stethoscope"></i> Gestion des Consultations</h2>
                 
-                <div id="consultation-form" class="form-section" style="display: none;">
-                    <div class="patient-info">
-                        <h3>Informations Patient</h3>
-                        <div id="selected-patient-info"></div>
-                    </div>
-
-                    <form id="consultation-data-form">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label>PA+</label>
-                                <input type="number" id="pa-plus" step="0.1">
-                            </div>
-                            <div class="form-group">
-                                <label>PB+</label>
-                                <input type="number" id="pb-plus" step="0.1">
-                            </div>
-                            <div class="form-group">
-                                <label>IMC</label>
-                                <input type="number" id="imc" readonly>
-                            </div>
+                <button id="toggle-consult-form" class="submit-btn" style="margin-bottom:1rem;">
+                    <i class="fas fa-plus"></i> Nouvelle Consultation
+                </button>
+                <div id="consultation-form" class="form-section" style="margin-top:0; display:none;">
+                    <h3>Nouvelle Consultation</h3>
+                    <form id="consultation-data-form" style="display:flex; flex-direction:column; gap:1rem;">
+                        <div class="form-group">
+                            <label>Nom</label>
+                            <input type="text" id="consult-nom" required>
                         </div>
                         <div class="form-group">
-                            <label>Compte Rendu</label>
-                            <textarea id="compte-rendu" rows="4"></textarea>
+                            <label>Prénom</label>
+                            <input type="text" id="consult-prenom" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Poids (kg)</label>
+                            <input type="number" id="consult-poids" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Taille (cm)</label>
+                            <input type="number" id="consult-taille" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tour de Taille (cm)</label>
+                            <input type="number" id="consult-tour-taille" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>PA+ (Paramètre Anthropométrique positif)</label>
+                            <input type="text" id="consult-pa-plus">
+                        </div>
+                        <div class="form-group">
+                            <label>PB+ (Paramètre Biologique positif)</label>
+                            <input type="text" id="consult-pb-plus">
+                        </div>
+                        <div class="form-group">
+                            <label>IMC</label>
+                            <input type="number" id="consult-imc" readonly style="background:#f3f3f3;">
                         </div>
                         <div class="form-actions">
                             <button type="submit" class="submit-btn">Enregistrer Consultation</button>
@@ -137,6 +150,14 @@
                     <div id="food-catalog-grid" class="catalog-grid">
                         <!-- Les aliments seront ajoutés dynamiquement ici -->
                     </div>
+                </div>
+
+                <button id="toggle-all-consults" class="submit-btn" style="margin:1.5rem 0 1rem 0;">
+                    <i class="fas fa-list"></i> Voir/Cacher toutes les consultations
+                </button>
+                <div id="all-consults-section" style="display:none; padding:1rem; background:#f8f9fa; border-radius:10px; box-shadow:0 2px 8px #0001; margin-bottom:2rem;">
+                    <h4 style="color:#5a8dee;">Liste des consultations</h4>
+                    <div id="all-consults-list" style="color:#333; font-size:1.05rem;">Aucune consultation à afficher.</div>
                 </div>
             </section>
         </div>
