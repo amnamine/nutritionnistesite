@@ -244,6 +244,23 @@
                 font-size: 1rem;
             }
         }
+
+        .home-btn {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%) !important;
+            color: #2563eb !important;
+            box-shadow: 0 6px 18px rgba(37,99,235,0.08);
+        }
+        .home-btn:hover {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e0e7ef 100%) !important;
+            color: #1d4ed8 !important;
+            box-shadow: 0 8px 24px rgba(37,99,235,0.13);
+            filter: brightness(1.04);
+        }
+        .home-btn:active {
+            filter: brightness(0.98);
+        }
+        /* Désactive l'overlay du bouton login-btn pour home-btn */
+        .home-btn::after { display: none !important; }
     </style>
 </head>
 <body>
@@ -265,6 +282,9 @@
             </button>
             <div id="login-error" class="error-message" style="display:none;"></div>
         </form>
+        <button onclick="window.location.href='/'" class="login-btn home-btn" style="margin-top:1.2rem;background:linear-gradient(135deg,#e2e8f0 0%,#cbd5e1 100%);color:#2563eb;">
+            <i class="fas fa-home"></i> Accueil
+        </button>
     </div>
     <script src="script.js"></script>
 </body>
