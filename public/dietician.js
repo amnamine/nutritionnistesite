@@ -138,6 +138,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
     }
+
+    loadTodayAppointments();
+    loadPatientCounters();
 });
 
 function showMainInterface(user) {
@@ -334,17 +337,17 @@ function displayTimeSlots(slots, date) {
 
 // Ajout de la fonction pour corriger l'erreur ReferenceError
 async function loadTodayAppointments() {
-    // Récupère les rendez-vous du jour pour ce diététicien (affichage à compléter selon besoin)
     try {
         const today = new Date().toISOString().split('T')[0];
-        // On suppose que l'utilisateur connecté est diététicien
         const response = await fetch(`/api/appointments?date=${today}`);
         if (!response.ok) throw new Error('Erreur lors du chargement des rendez-vous du jour');
         const appointments = await response.json();
-        // Tu peux ici afficher les rendez-vous dans le DOM si besoin
-        console.log('Rendez-vous du jour:', appointments);
+        const todayAppointmentsElem = document.getElementById('today-appointments');
+        if (todayAppointmentsElem) todayAppointmentsElem.textContent = appointments.length;
     } catch (error) {
         console.error('Erreur chargement rendez-vous du jour:', error);
+        const todayAppointmentsElem = document.getElementById('today-appointments');
+        if (todayAppointmentsElem) todayAppointmentsElem.textContent = '0';
     }
 }
 
@@ -359,6 +362,29 @@ async function loadStatistics() {
         console.log('Statistiques:', stats);
     } catch (error) {
         console.error('Erreur chargement statistiques:', error);
+    }
+}
+
+async function loadPatientCounters() {
+    try {
+        const response = await fetch('/api/patients?includeArchived=true');
+        if (!response.ok) throw new Error('Erreur lors du chargement des patients');
+        const patients = await response.json();
+        let active = 0, archived = 0;
+        patients.forEach(p => {
+            if (p.status === 'archived') archived++;
+            else active++;
+        });
+        const activeElem = document.getElementById('active-patients');
+        const archivedElem = document.getElementById('archived-patients');
+        if (activeElem) activeElem.textContent = active;
+        if (archivedElem) archivedElem.textContent = archived;
+    } catch (error) {
+        console.error('Erreur chargement patients:', error);
+        const activeElem = document.getElementById('active-patients');
+        const archivedElem = document.getElementById('archived-patients');
+        if (activeElem) activeElem.textContent = '0';
+        if (archivedElem) archivedElem.textContent = '0';
     }
 }
 
