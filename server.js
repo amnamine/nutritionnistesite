@@ -245,26 +245,37 @@ app.post('/api/users', requireAuth, requireRole(['admin']), async (req, res) => 
 });
 
 app.put('/api/users/:id', requireAuth, requireRole(['admin']), async (req, res) => {
-    const { username, password, role, status } = req.body;
     const userId = req.params.id;
+    // Récupère l'utilisateur existant
+    db.get('SELECT * FROM users WHERE id = ?', [userId], async (err, user) => {
+        if (err || !user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
 
-    try {
-        if (password) {
-            const hash = await bcrypt.hash(password, 10);
+        // On fusionne les champs reçus avec ceux existants
+        const username = req.body.username !== undefined ? req.body.username : user.username;
+        const role = req.body.role !== undefined ? req.body.role : user.role;
+        const status = req.body.status !== undefined ? req.body.status : user.status;
+
+        if (req.body.password) {
+            const hash = await bcrypt.hash(req.body.password, 10);
             db.run(
                 'UPDATE users SET username = ?, password = ?, role = ?, status = ? WHERE id = ?',
-                [username, hash, role, status, userId]
+                [username, hash, role, status, userId],
+                function (err) {
+                    if (err) return res.status(500).json({ error: err.message });
+                    res.json({ message: 'Utilisateur mis à jour avec succès' });
+                }
             );
         } else {
             db.run(
                 'UPDATE users SET username = ?, role = ?, status = ? WHERE id = ?',
-                [username, role, status, userId]
+                [username, role, status, userId],
+                function (err) {
+                    if (err) return res.status(500).json({ error: err.message });
+                    res.json({ message: 'Utilisateur mis à jour avec succès' });
+                }
             );
         }
-        res.json({ message: 'Utilisateur mis à jour avec succès' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+    });
 });
 
 app.delete('/api/users/:id', requireAuth, requireRole(['admin']), (req, res) => {
