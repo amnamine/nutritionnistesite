@@ -689,8 +689,8 @@
         </ul>
         <div class="nav-buttons">
             <a href="/login.html" class="btn btn-primary">
-                <i class="fas fa-sign-in-alt"></i>
-                Connexion
+            <i class="fas fa-sign-in-alt"></i>
+            Connexion
             </a>
         </div>
     </nav>
@@ -756,9 +756,9 @@
                     <a href="https://www.twitter.com" target="_blank"><i class="fab fa-twitter" style="font-size: 2.5rem;"></i></a>
                     <a href="https://www.instagram.com" target="_blank"><i class="fab fa-instagram" style="font-size: 2.5rem;"></i></a>
                     <a href="https://www.linkedin.com" target="_blank"><i class="fab fa-linkedin" style="font-size: 2.5rem;"></i></a>
-                </div>
             </div>
         </div>
+    </div>
         <p style="margin-top: 3rem; text-align: center; opacity: 0.8;">&copy; 2025 Cabinet de Diététique. Tous droits réservés.</p>
     </footer>
 
@@ -812,8 +812,13 @@
             ];
             const navLinks = document.querySelectorAll('.nav-links a');
             let current = '';
+            // Prendre en compte la hauteur de la navbar
+            const navbar = document.querySelector('.main-navbar');
+            const navbarHeight = navbar ? navbar.offsetHeight : 0;
+            // Utiliser le centre de la fenêtre (ou un peu sous la navbar)
+            const scrollPosition = window.scrollY + navbarHeight + window.innerHeight / 3;
             sections.forEach((section, idx) => {
-                if (section && window.scrollY + 120 >= section.offsetTop) {
+                if (section && scrollPosition >= section.offsetTop) {
                     current = navLinks[idx];
                 }
             });
@@ -825,7 +830,6 @@
             if (current) current.classList.add('active');
 
             // Effet d'ombre/fond uniquement
-            const navbar = document.querySelector('.main-navbar');
             if (window.scrollY > 50) {
                 navbar.classList.add('scrolled');
             } else {
