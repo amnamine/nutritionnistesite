@@ -140,21 +140,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     loadPatientCounters();
 
-    // Charger la liste des patients dans le select du formulaire de consultation
-    async function populatePatientSelect() {
-        const select = document.getElementById('consult-patient');
-        if (!select) return;
-        try {
-            const res = await fetch('/api/patients?includeArchived=false');
-            const patients = await res.json();
-            select.innerHTML = '<option value="">Sélectionner un patient...</option>' +
-                patients.map(p => `<option value="${p.id}">${p.first_name} ${p.last_name}</option>`).join('');
-        } catch (e) {
-            select.innerHTML = '<option value="">Erreur chargement patients</option>';
-        }
-    }
-    populatePatientSelect();
-
     // Formulaire de consultation : calcul automatique de l'IMC
     const poidsInput = document.getElementById('consult-poids');
     const tailleInput = document.getElementById('consult-taille');
@@ -176,42 +161,54 @@ document.addEventListener('DOMContentLoaded', async () => {
         tailleInput.addEventListener('input', updateIMC);
     }
 
+    // Remplir dynamiquement la liste des patients dans le select du formulaire de consultation
+    const consultPatientSelect = document.getElementById('consult-patient');
+    if (consultPatientSelect) {
+        fetch('/api/patients?includeArchived=false')
+            .then(res => res.json())
+            .then(patients => {
+                patients.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.textContent = `${p.first_name} ${p.last_name}`;
+                    consultPatientSelect.appendChild(opt);
+                });
+            });
+    }
+
     // Gestion de la soumission du formulaire de consultation
     const consultForm = document.getElementById('consultation-data-form');
     if (consultForm) {
         consultForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            const patientId = document.getElementById('consult-patient').value;
-            if (!patientId) {
-                showNotification('Veuillez sélectionner un patient', 'error');
-                return;
-            }
             const data = {
-                patient_id: patientId,
-                poids: document.getElementById('consult-poids').value,
-                taille: document.getElementById('consult-taille').value,
-                tour_taille: document.getElementById('consult-tour-taille').value,
+                patient_id: document.getElementById('consult-patient').value,
                 pa_plus: document.getElementById('consult-pa-plus').value,
                 pb_plus: document.getElementById('consult-pb-plus').value,
-                imc: document.getElementById('consult-imc').value
+                imc: document.getElementById('consult-imc').value,
+                weight: document.getElementById('consult-poids').value,
+                height: document.getElementById('consult-taille').value,
+                tour_taille: document.getElementById('consult-tour-taille').value,
+                nom: document.getElementById('consult-nom').value,
+                prenom: document.getElementById('consult-prenom').value
             };
             try {
-                const res = await fetch('/api/consultations', {
+                const response = await fetch('/api/consultations', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
                     body: JSON.stringify(data)
                 });
-                if (res.ok) {
-                    showNotification('Consultation enregistrée avec succès', 'success');
+                if (response.ok) {
+                    showNotification('Consultation enregistrée avec succès !', 'success');
                     consultForm.reset();
                     imcInput.value = '';
                 } else {
-                    const err = await res.json();
-                    showNotification('Erreur: ' + (err.error || 'enregistrement impossible'), 'error');
+                    const err = await response.json();
+                    showNotification('Erreur lors de l\'enregistrement : ' + (err.error || response.status), 'error');
                 }
             } catch (err) {
-                showNotification('Erreur réseau lors de l\'enregistrement', 'error');
+                showNotification('Erreur lors de l\'enregistrement', 'error');
             }
         });
     }
