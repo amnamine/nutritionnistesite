@@ -233,34 +233,73 @@ document.addEventListener('DOMContentLoaded', async () => {
     let consultsLoaded = false;
     if (toggleAllConsultsBtn && allConsultsSection && allConsultsList) {
         toggleAllConsultsBtn.addEventListener('click', async () => {
+            console.log('Bouton toggle consultations cliqué');
             if (allConsultsSection.style.display === 'none' || allConsultsSection.style.display === '') {
                 allConsultsSection.style.display = 'block';
-                // Charger les consultations si pas déjà fait ou à chaque affichage (selon besoin)
                 try {
+                    console.log('Début du chargement des consultations...');
                     allConsultsList.innerHTML = '<div style="color:#888;">Chargement...</div>';
-                    const res = await fetch('/api/consultations', { credentials: 'include' });
+                    
+                    // Vérifier d'abord l'authentification
+                    const authCheck = await fetch('/api/me', {
+                        credentials: 'include'
+                    });
+                    
+                    if (!authCheck.ok) {
+                        throw new Error('Non authentifié');
+                    }
+                    
+                    const user = await authCheck.json();
+                    console.log('Utilisateur connecté:', user);
+                    
+                    const res = await fetch('/api/consultations', { 
+                        method: 'GET',
+                        credentials: 'include',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    console.log('Réponse reçue:', res.status, res.statusText);
+                    
+                    if (!res.ok) {
+                        const errorData = await res.json().catch(() => ({}));
+                        throw new Error(`Erreur HTTP: ${res.status} ${res.statusText} - ${errorData.error || ''}`);
+                    }
+                    
                     const consults = await res.json();
+                    console.log('Consultations reçues:', consults);
+                    
                     if (Array.isArray(consults) && consults.length > 0) {
                         allConsultsList.innerHTML = consults.map(c => `
-                            <div class="consultation-history-item">
-                                <div class="consultation-date"><i class="fas fa-calendar-alt"></i> ${c.date ? c.date.split('T')[0] : ''}</div>
-                                <div class="consultation-data">
+                            <div class="consultation-history-item" style="background: #fff; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <div class="consultation-date" style="color: #5a8dee; font-weight: bold; margin-bottom: 0.5rem;">
+                                    <i class="fas fa-calendar-alt"></i> ${c.date ? new Date(c.date).toLocaleDateString('fr-FR') : 'Date non spécifiée'}
+                                </div>
+                                <div class="consultation-data" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem;">
                                     <p><strong>Patient :</strong> ${c.first_name || ''} ${c.last_name || ''}</p>
-                                    <p><strong>Poids :</strong> ${c.weight || ''} kg</p>
-                                    <p><strong>Taille :</strong> ${c.height || ''} cm</p>
-                                    <p><strong>IMC :</strong> ${c.imc || ''}</p>
-                                    <p><strong>PA+ :</strong> ${c.pa_plus || ''}</p>
-                                    <p><strong>PB+ :</strong> ${c.pb_plus || ''}</p>
-                                    <p><strong>Tour de taille :</strong> ${c.tour_taille || ''}</p>
-                                    <p><strong>Compte rendu :</strong> ${c.compte_rendu || ''}</p>
+                                    <p><strong>Poids :</strong> ${c.weight || 'Non renseigné'} kg</p>
+                                    <p><strong>Taille :</strong> ${c.height || 'Non renseigné'} cm</p>
+                                    <p><strong>IMC :</strong> ${c.imc || 'Non calculé'}</p>
+                                    <p><strong>PA+ :</strong> ${c.pa_plus || 'Non renseigné'}</p>
+                                    <p><strong>PB+ :</strong> ${c.pb_plus || 'Non renseigné'}</p>
+                                    <p><strong>Tour de taille :</strong> ${c.tour_taille || 'Non renseigné'} cm</p>
+                                    <p><strong>Compte rendu :</strong> ${c.compte_rendu || 'Non renseigné'}</p>
                                 </div>
                             </div>
                         `).join('');
                     } else {
-                        allConsultsList.innerHTML = 'Aucune consultation à afficher.';
+                        allConsultsList.innerHTML = '<div style="text-align: center; color: #666; padding: 2rem;">Aucune consultation à afficher.</div>';
                     }
                 } catch (e) {
-                    allConsultsList.innerHTML = '<span style="color:red;">Erreur lors du chargement des consultations.</span>';
+                    console.error('Erreur détaillée:', e);
+                    allConsultsList.innerHTML = `
+                        <div style="color: #e74c3c; text-align: center; padding: 2rem; background: #fdf3f2; border-radius: 8px; margin: 1rem 0;">
+                            <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                            <p>Erreur lors du chargement des consultations.</p>
+                            <p style="font-size: 0.9rem; color: #666;">Détails: ${e.message}</p>
+                        </div>`;
                 }
             } else {
                 allConsultsSection.style.display = 'none';
