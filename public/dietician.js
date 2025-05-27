@@ -138,7 +138,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    loadTodayAppointments();
     loadPatientCounters();
 });
 
@@ -149,7 +148,6 @@ function showMainInterface(user) {
     if (calendar) {
         initializeCalendar();
     }
-    loadTodayAppointments();
     // Désactive temporairement les stats pour éviter l'erreur 403
     // try { loadStatistics(); } catch(e) {}
 }
