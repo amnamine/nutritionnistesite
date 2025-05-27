@@ -144,6 +144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Gestion de l'affichage/masquage de la liste des rendez-vous
     const toggleAppointmentsBtn = document.getElementById('toggle-appointments-list');
     const appointmentsSection = document.getElementById('appointments-list-section');
+    const appointmentsList = document.getElementById('appointments-list');
 
     if (toggleAppointmentsBtn && appointmentsSection) {
         toggleAppointmentsBtn.addEventListener('click', () => {
@@ -155,6 +156,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             if (!isVisible) {
                 loadAllAppointments();
+            }
+        });
+    }
+
+    // Délégation d'événement pour les boutons Modifier/Annuler dans la liste des rendez-vous
+    if (appointmentsList) {
+        appointmentsList.addEventListener('click', function(e) {
+            const editBtn = e.target.closest('.edit-btn');
+            const cancelBtn = e.target.closest('.cancel-btn');
+            if (editBtn) {
+                const id = editBtn.getAttribute('data-id');
+                if (id) editAppointment(Number(id));
+            } else if (cancelBtn) {
+                const id = cancelBtn.getAttribute('data-id');
+                if (id) cancelAppointment(Number(id));
             }
         });
     }
@@ -613,10 +629,10 @@ async function loadAllAppointments() {
                     </p>
                 </div>
                 <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                    <button onclick="editAppointment(${apt.id})" class="edit-btn" style="flex: 1; padding: 0.5rem; border: none; border-radius: 6px; background: #e8f0fe; color: #5a8dee; cursor: pointer;">
+                    <button class="edit-btn" data-id="${apt.id}" style="flex: 1; padding: 0.5rem; border: none; border-radius: 6px; background: #e8f0fe; color: #5a8dee; cursor: pointer;">
                         <i class="fas fa-edit"></i> Modifier
                     </button>
-                    <button onclick="cancelAppointment(${apt.id})" class="cancel-btn" style="flex: 1; padding: 0.5rem; border: none; border-radius: 6px; background: #fee8e8; color: #e74c3c; cursor: pointer;">
+                    <button class="cancel-btn" data-id="${apt.id}" style="flex: 1; padding: 0.5rem; border: none; border-radius: 6px; background: #fee8e8; color: #e74c3c; cursor: pointer;">
                         <i class="fas fa-times"></i> Annuler
                     </button>
                 </div>
@@ -633,19 +649,18 @@ async function loadAllAppointments() {
     }
 }
 
-async function editAppointment(appointmentId) {
-    // Show calendar for rescheduling
-    $(calendar).fullCalendar('today');
-}
+// S'assurer que les fonctions sont globales
+window.editAppointment = async function(appointmentId) {
+    // À personnaliser selon la logique de modification souhaitée
+    alert('Fonction de modification à implémenter pour le rendez-vous #' + appointmentId);
+};
 
-async function cancelAppointment(appointmentId) {
+window.cancelAppointment = async function(appointmentId) {
     if (!confirm('Êtes-vous sûr de vouloir annuler ce rendez-vous ?')) return;
-
     try {
         const response = await fetch(`/api/appointments/${appointmentId}`, {
             method: 'DELETE'
         });
-
         if (response.ok) {
             loadAllAppointments();
             showNotification('Rendez-vous annulé avec succès');
@@ -654,7 +669,7 @@ async function cancelAppointment(appointmentId) {
         console.error('Error cancelling appointment:', error);
         showNotification('Erreur lors de l\'annulation du rendez-vous', 'error');
     }
-}
+};
 
 async function loadTodayAppointments() {
     const today = new Date().toISOString().split('T')[0];

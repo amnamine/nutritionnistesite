@@ -437,6 +437,21 @@ app.post('/api/appointments', requireAuth, (req, res) => {
     );
 });
 
+app.delete('/api/appointments/:id', requireAuth, (req, res) => {
+    const appointmentId = req.params.id;
+    db.run('DELETE FROM appointments WHERE id = ?', [appointmentId], function(err) {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        if (this.changes === 0) {
+            res.status(404).json({ error: 'Rendez-vous non trouvé' });
+            return;
+        }
+        res.json({ message: 'Rendez-vous supprimé' });
+    });
+});
+
 app.get('/api/consultations/:patientId', requireAuth, (req, res) => {
     const patientId = req.params.patientId;
     
