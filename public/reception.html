@@ -429,6 +429,23 @@
             <section class="section">
                 <h2><i class="fas fa-calendar-plus"></i> Prise de rendez-vous</h2>
                 
+                <!-- Bouton pour afficher/masquer la liste des rendez-vous -->
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem; justify-content: flex-end;">
+                    <button id="toggle-appointments-list" class="submit-btn">
+                        <i class="fas fa-calendar-alt"></i> Voir tous les rendez-vous
+                    </button>
+                </div>
+
+                <!-- Section pour afficher la liste des rendez-vous -->
+                <div id="appointments-list-section" style="display: none; margin-bottom: 2rem;">
+                    <div class="appointments-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="color: #5a8dee; margin: 0;"><i class="fas fa-calendar-check"></i> Liste des rendez-vous</h3>
+                    </div>
+                    <div id="appointments-list" class="appointments-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;">
+                        <!-- Les rendez-vous seront affichés ici dynamiquement -->
+                    </div>
+                </div>
+                
                 <div class="booking-container">
                     <!-- Progress Bar -->
                     <div class="booking-progress">

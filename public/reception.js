@@ -140,6 +140,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('progress-step3').classList.remove('completed');
         };
     }
+
+    // Gestion de l'affichage/masquage de la liste des rendez-vous
+    const toggleAppointmentsBtn = document.getElementById('toggle-appointments-list');
+    const appointmentsSection = document.getElementById('appointments-list-section');
+
+    if (toggleAppointmentsBtn && appointmentsSection) {
+        toggleAppointmentsBtn.addEventListener('click', () => {
+            const isVisible = appointmentsSection.style.display !== 'none';
+            appointmentsSection.style.display = isVisible ? 'none' : 'block';
+            toggleAppointmentsBtn.innerHTML = isVisible ? 
+                '<i class="fas fa-calendar-alt"></i> Voir tous les rendez-vous' : 
+                '<i class="fas fa-calendar-alt"></i> Cacher les rendez-vous';
+            
+            if (!isVisible) {
+                loadAllAppointments();
+            }
+        });
+    }
 });
 
 // Logout
@@ -502,7 +520,7 @@ async function confirmAppointment() {
             await loadTodayAppointments();
             const appointmentDateInput = document.getElementById('appointment-date');
             if (appointmentDateInput) appointmentDateInput.value = date;
-            await searchAppointments();
+            await loadAllAppointments();
         } else {
             const error = await response.json();
             console.error('API error:', error);
@@ -555,58 +573,64 @@ function cancelBooking() {
     if (existingSummary) existingSummary.remove();
 }
 
-async function searchAppointments() {
-    const dateInput = document.getElementById('appointment-date');
-    const dieticianSelect = document.getElementById('dietician-select');
-    const date = dateInput ? dateInput.value : '';
-    const dieticianId = dieticianSelect ? dieticianSelect.value : '';
-    if (!date || !dieticianId) {
-        // Show green success message instead of error
-        let confirmationDiv = document.getElementById('appointment-confirmed-message');
-        if (!confirmationDiv) {
-            confirmationDiv = document.createElement('div');
-            confirmationDiv.id = 'appointment-confirmed-message';
-            confirmationDiv.style.background = '#4caf50';
-            confirmationDiv.style.color = 'white';
-            confirmationDiv.style.fontSize = '1.3rem';
-            confirmationDiv.style.fontWeight = 'bold';
-            confirmationDiv.style.textAlign = 'center';
-            confirmationDiv.style.margin = '1rem 0';
-            confirmationDiv.style.padding = '1rem';
-            confirmationDiv.style.borderRadius = '8px';
-            document.body.prepend(confirmationDiv);
-        }
-        confirmationDiv.textContent = 'Veuillez sélectionner une date et un diététicien';
-        setTimeout(() => { if (confirmationDiv) confirmationDiv.remove(); }, 4000);
-        return;
-    }
+// Fonction pour charger tous les rendez-vous
+async function loadAllAppointments() {
+    const appointmentsList = document.getElementById('appointments-list');
+    
     try {
-        const response = await fetch(`/api/appointments?date=${date}&dieticianId=${dieticianId}`);
+        const response = await fetch('/api/appointments');
+        if (!response.ok) throw new Error('Erreur lors de la récupération des rendez-vous');
+        
         const appointments = await response.json();
-        displayAppointments(appointments);
-    } catch (error) {
-        console.error('Error searching appointments:', error);
-        showNotification('Erreur lors de la recherche des rendez-vous', 'error');
-    }
-}
+        
+        if (appointments.length === 0) {
+            appointmentsList.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #666; background: #f8f9fa; border-radius: 8px;">
+                    <i class="fas fa-calendar-times" style="font-size: 2rem; margin-bottom: 1rem; color: #5a8dee;"></i>
+                    <p>Aucun rendez-vous trouvé.</p>
+                </div>`;
+            return;
+        }
 
-function displayAppointments(appointments) {
-    const listDiv = document.getElementById('appointment-list');
-    listDiv.innerHTML = appointments.map(apt => `
-        <div class="appointment-card">
-            <h3>${apt.first_name} ${apt.last_name}</h3>
-            <p><i class="fas fa-calendar"></i> ${apt.date}</p>
-            <p><i class="fas fa-clock"></i> ${apt.time}</p>
-            <div class="action-buttons">
-                <button class="edit-btn" onclick="editAppointment(${apt.id})">
-                    <i class="fas fa-edit"></i> Modifier
-                </button>
-                <button class="cancel-btn" onclick="cancelAppointment(${apt.id})">
-                    <i class="fas fa-times"></i> Annuler
-                </button>
+        appointmentsList.innerHTML = appointments.map(apt => `
+            <div class="appointment-card" style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #5a8dee;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <div>
+                        <h4 style="color: #5a8dee; margin: 0 0 0.5rem 0; font-size: 1.1rem;">
+                            <i class="fas fa-user"></i> ${apt.first_name} ${apt.last_name}
+                        </h4>
+                        <p style="color: #666; margin: 0;">
+                            <i class="fas fa-user-md"></i> ${apt.dietician_name || 'Diététicien non spécifié'}
+                        </p>
+                    </div>
+                    <span style="background: #e8f0fe; color: #5a8dee; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.9rem;">
+                        ${apt.time}
+                    </span>
+                </div>
+                <div style="color: #666; font-size: 0.95rem;">
+                    <p style="margin: 0.5rem 0;">
+                        <i class="fas fa-calendar"></i> ${new Date(apt.date).toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                    </p>
+                </div>
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                    <button onclick="editAppointment(${apt.id})" class="edit-btn" style="flex: 1; padding: 0.5rem; border: none; border-radius: 6px; background: #e8f0fe; color: #5a8dee; cursor: pointer;">
+                        <i class="fas fa-edit"></i> Modifier
+                    </button>
+                    <button onclick="cancelAppointment(${apt.id})" class="cancel-btn" style="flex: 1; padding: 0.5rem; border: none; border-radius: 6px; background: #fee8e8; color: #e74c3c; cursor: pointer;">
+                        <i class="fas fa-times"></i> Annuler
+                    </button>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `).join('');
+    } catch (error) {
+        console.error('Error loading appointments:', error);
+        appointmentsList.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #e74c3c; background: #fdf3f2; border-radius: 8px;">
+                <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <p>Erreur lors du chargement des rendez-vous.</p>
+                <p style="font-size: 0.9rem; color: #666;">${error.message}</p>
+            </div>`;
+    }
 }
 
 async function editAppointment(appointmentId) {
@@ -623,7 +647,7 @@ async function cancelAppointment(appointmentId) {
         });
 
         if (response.ok) {
-            searchAppointments();
+            loadAllAppointments();
             showNotification('Rendez-vous annulé avec succès');
         }
     } catch (error) {
