@@ -8,7 +8,7 @@ const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
 
 const app = express();
-const port = 3000;
+const port = 10000;
 
 // Middleware
 app.use(cors());
